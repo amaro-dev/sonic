@@ -1,6 +1,5 @@
 package dev.amaro.sonic
 
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
 interface IAction
@@ -11,7 +10,7 @@ interface IProcessor<T> {
 }
 
 interface IStateManager<T> {
-    fun listen(): Flow<T>
+    fun listen(): MutableStateFlow<T>
     fun process(action: IAction)
 }
 
@@ -29,9 +28,7 @@ abstract class StateManager<T>(
 
     protected abstract val processor: IProcessor<T>
 
-    override fun listen(): Flow<T> {
-        return state
-    }
+    override fun listen() = state
 
     override fun process(action: IAction) {
         middlewareList.forEach { it.process(action, state.value, processor) }

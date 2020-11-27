@@ -1,5 +1,8 @@
 package dev.amaro.sonic
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+
 object Example2 {
 
     class OperationParser : IMiddleware<State> {
@@ -19,21 +22,17 @@ object Example2 {
 
     class Calculation : IMiddleware<State> {
         override fun process(action: IAction, state: State, processor: IProcessor<State>) {
-            when (action) {
-                is Action.FirstNumber, is Action.Restart -> {
-                    processor.reduce(action)
+            if (action is Action.SecondNumber || action is Action.FirstNumber || action is Action.Restart) {
+                processor.reduce(action)
+            }
+            if (state.firstNumber != null && state.secondNumber != null && state.operation != null) {
+                val result = when (state.operation) {
+                    Operation.Add -> state.firstNumber + state.secondNumber
+                    Operation.Multiply -> state.firstNumber * state.secondNumber
+                    Operation.Subtract -> state.firstNumber - state.secondNumber
+                    Operation.Division -> state.firstNumber / state.secondNumber
                 }
-                is Action.SecondNumber -> {
-                    val result = when (state.operation) {
-                        Operation.Add -> state.firstNumber!! + action.number
-                        Operation.Multiply -> state.firstNumber!! * action.number
-                        Operation.Subtract -> state.firstNumber!! - action.number
-                        Operation.Division -> state.firstNumber!! / action.number
-                        else -> 0
-                    }
-                    processor.reduce(action)
-                    processor.reduce(Action.SetResult(result))
-                }
+                processor.reduce(Action.SetResult(result))
             }
         }
     }
@@ -54,31 +53,32 @@ object Example2 {
         }
     }
 
-    class SimpleScreen : Screen<State>(SimpleStateManager()) {
+    class SimpleScreen(
+        renderer: IRenderer<State>,
+        collectScope: CoroutineDispatcher = Dispatchers.Default
+    ) :
+        Screen<State>(SimpleStateManager(), renderer, collectScope)
 
-        init {
-            perform(Action.Restart)
-        }
-
-        override fun render(state: State) {
+    class TerminalRenderer : IRenderer<State> {
+        override fun render(state: State, performer: IPerformer<State>) {
             when {
                 state.firstNumber == null -> {
                     println("Enter the first number: ")
-                    perform(Action.FirstNumber(readLine()?.toInt() ?: 0))
+                    performer.perform(Action.FirstNumber(readLine()?.toInt() ?: 0))
                 }
                 state.operation == null -> {
                     println("Enter the operation: ")
-                    perform(Action.OperationChoice(readLine() ?: ""))
+                    performer.perform(Action.OperationChoice(readLine() ?: ""))
                 }
                 state.secondNumber == null -> {
                     println("Enter the second number: ")
-                    perform(Action.SecondNumber(readLine()?.toInt() ?: 0))
+                    performer.perform(Action.SecondNumber(readLine()?.toInt() ?: 0))
                 }
                 else -> {
                     println("The result is: ${state.firstNumber} ${state.operation.symbol} ${state.secondNumber} = ${state.result}")
                     println("Press enter to restart")
                     readLine()
-                    perform(Action.Restart)
+                    performer.perform(Action.Restart)
                 }
             }
         }

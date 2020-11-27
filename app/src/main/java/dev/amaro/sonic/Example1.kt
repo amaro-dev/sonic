@@ -23,7 +23,7 @@ object Example1 {
             perform(Action.Restart)
         }
 
-        override fun render(state: State) {
+        override fun render(state: State, performer: IPerformer<State>) {
             if (state.number == null) {
                 println("Enter a number: ")
                 perform(Action.InputNumber(readLine()?.toInt() ?: 0))

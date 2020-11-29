@@ -1,6 +1,9 @@
 package dev.amaro.sonic
 
+import dev.amaro.sonic.samples.Calculator
+import dev.amaro.sonic.samples.TerminalRenderer
+
 fun main(args: Array<String>) {
-    val screen = Example2.SimpleScreen(Example2.TerminalRenderer())
+    val screen = Calculator.SimpleScreen(TerminalRenderer())
     while (true);
 }

@@ -1,5 +1,6 @@
 package dev.amaro.sonic
 
+import dev.amaro.sonic.samples.Calculator
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
@@ -14,32 +15,32 @@ class CalculatorTest {
 
     @Test
     fun `Initial screen state`() = dispatcher.runBlockingTest {
-        val renderer: IRenderer<Example2.State> = mockk(relaxed = true)
-        Example2.SimpleScreen(renderer, dispatcher)
+        val renderer: IRenderer<Calculator.State> = mockk(relaxed = true)
+        Calculator.SimpleScreen(renderer, dispatcher)
         verifyOrder {
-            renderer.render(Example2.State(), any())
+            renderer.render(Calculator.State(), any())
         }
     }
 
     @Test
     fun `Enter first number`() = dispatcher.runBlockingTest {
-        val renderer: IRenderer<Example2.State> = mockk(relaxed = true)
-        Example2.SimpleScreen(renderer, dispatcher).run {
-            perform(Example2.Action.FirstNumber(1))
+        val renderer: IRenderer<Calculator.State> = mockk(relaxed = true)
+        Calculator.SimpleScreen(renderer, dispatcher).run {
+            perform(Calculator.Action.FirstNumber(1))
         }
         verify {
-            renderer.render(Example2.State(firstNumber = 1), any())
+            renderer.render(Calculator.State(firstNumber = 1), any())
         }
     }
 
     @Test
     fun `Enter second number`() = dispatcher.runBlockingTest {
-        val renderer: IRenderer<Example2.State> = mockk(relaxed = true)
-        Example2.SimpleScreen(renderer, dispatcher).run {
-            perform(Example2.Action.SecondNumber(1))
+        val renderer: IRenderer<Calculator.State> = mockk(relaxed = true)
+        Calculator.SimpleScreen(renderer, dispatcher).run {
+            perform(Calculator.Action.SecondNumber(1))
         }
         verifySequence {
-            renderer.render(Example2.State(secondNumber = 1), any())
+            renderer.render(Calculator.State(secondNumber = 1), any())
         }
     }
 }

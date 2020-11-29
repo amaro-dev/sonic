@@ -1,9 +1,10 @@
-package dev.amaro.sonic
+package dev.amaro.sonic.samples
 
+import dev.amaro.sonic.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
-object Example2 {
+object Calculator {
 
     class OperationParser : IMiddleware<State> {
         override fun process(action: IAction, state: State, processor: IProcessor<State>) {
@@ -58,31 +59,6 @@ object Example2 {
         collectScope: CoroutineDispatcher = Dispatchers.Default
     ) :
         Screen<State>(SimpleStateManager(), renderer, collectScope)
-
-    class TerminalRenderer : IRenderer<State> {
-        override fun render(state: State, performer: IPerformer<State>) {
-            when {
-                state.firstNumber == null -> {
-                    println("Enter the first number: ")
-                    performer.perform(Action.FirstNumber(readLine()?.toInt() ?: 0))
-                }
-                state.operation == null -> {
-                    println("Enter the operation: ")
-                    performer.perform(Action.OperationChoice(readLine() ?: ""))
-                }
-                state.secondNumber == null -> {
-                    println("Enter the second number: ")
-                    performer.perform(Action.SecondNumber(readLine()?.toInt() ?: 0))
-                }
-                else -> {
-                    println("The result is: ${state.firstNumber} ${state.operation.symbol} ${state.secondNumber} = ${state.result}")
-                    println("Press enter to restart")
-                    readLine()
-                    performer.perform(Action.Restart)
-                }
-            }
-        }
-    }
 
     sealed class Action : IAction {
         object Restart : Action()

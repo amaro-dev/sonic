@@ -1,4 +1,4 @@
-package dev.amaro.sonic.samples
+package dev.amaro.sonic.samples.calculator
 
 import dev.amaro.sonic.IPerformer
 import dev.amaro.sonic.IRenderer

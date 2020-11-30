@@ -1,4 +1,4 @@
-package dev.amaro.sonic.samples
+package dev.amaro.sonic.samples.calculator
 
 import android.widget.EditText
 import android.widget.RadioButton

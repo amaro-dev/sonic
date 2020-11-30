@@ -2,8 +2,8 @@ package dev.amaro.sonic
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import dev.amaro.sonic.samples.ActivityRenderer
-import dev.amaro.sonic.samples.Calculator
+import dev.amaro.sonic.samples.calculator.ActivityRenderer
+import dev.amaro.sonic.samples.calculator.Calculator
 import kotlinx.coroutines.Dispatchers
 
 class MainActivity : AppCompatActivity() {

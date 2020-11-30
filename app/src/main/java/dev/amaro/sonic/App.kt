@@ -1,7 +1,7 @@
 package dev.amaro.sonic
 
-import dev.amaro.sonic.samples.Calculator
-import dev.amaro.sonic.samples.TerminalRenderer
+import dev.amaro.sonic.samples.calculator.Calculator
+import dev.amaro.sonic.samples.calculator.TerminalRenderer
 
 fun main(args: Array<String>) {
     val screen = Calculator.SimpleScreen(TerminalRenderer())

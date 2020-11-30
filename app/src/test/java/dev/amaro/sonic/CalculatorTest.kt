@@ -1,6 +1,6 @@
 package dev.amaro.sonic
 
-import dev.amaro.sonic.samples.Calculator
+import dev.amaro.sonic.samples.calculator.Calculator
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder

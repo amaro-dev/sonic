@@ -1,4 +1,4 @@
-package dev.amaro.sonic.samples
+package dev.amaro.sonic.samples.calculator
 
 import dev.amaro.sonic.*
 import kotlinx.coroutines.CoroutineDispatcher

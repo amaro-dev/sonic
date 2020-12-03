@@ -1,4 +1,4 @@
-package dev.amaro.sonic.samples.calculator
+package dev.amaro.sonic.app.samples.calculator
 
 import android.widget.EditText
 import android.widget.RadioButton
@@ -9,7 +9,7 @@ import androidx.core.text.isDigitsOnly
 import androidx.core.widget.doOnTextChanged
 import dev.amaro.sonic.IPerformer
 import dev.amaro.sonic.IRenderer
-import dev.amaro.sonic.R
+import dev.amaro.sonic.app.R
 
 class ActivityRenderer(activity: AppCompatActivity) : IRenderer<Calculator.State> {
     private val number1: EditText = activity.findViewById(R.id.number1)

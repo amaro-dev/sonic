@@ -1,10 +1,9 @@
 package dev.amaro.sonic
 
-import dev.amaro.sonic.samples.calculator.Calculator
+import dev.amaro.sonic.app.samples.calculator.Calculator
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyOrder
-import io.mockk.verifySequence
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
@@ -39,7 +38,7 @@ class CalculatorTest {
         Calculator.SimpleScreen(renderer, dispatcher).run {
             perform(Calculator.Action.SecondNumber(1))
         }
-        verifySequence {
+        verify {
             renderer.render(Calculator.State(secondNumber = 1), any())
         }
     }

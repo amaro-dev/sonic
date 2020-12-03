@@ -1,6 +1,6 @@
 package dev.amaro.sonic
 
-import dev.amaro.sonic.samples.converter.Converter
+import dev.amaro.sonic.app.samples.converter.Converter
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.test.TestCoroutineDispatcher

@@ -1,4 +1,4 @@
-package dev.amaro.sonic.samples.converter
+package dev.amaro.sonic.app.samples.converter
 
 import androidx.annotation.Size
 import kotlinx.coroutines.flow.Flow

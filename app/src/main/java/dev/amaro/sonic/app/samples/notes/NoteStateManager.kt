@@ -1,13 +1,11 @@
 package dev.amaro.sonic.app.samples.notes
 
-import dev.amaro.sonic.IAction
-import dev.amaro.sonic.IProcessor
-import dev.amaro.sonic.Processor
-import dev.amaro.sonic.StateManager
+import dev.amaro.sonic.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class NoteStateManager(initialState: NoteState) : StateManager<NoteState>(initialState),
+class NoteStateManager(initialState: NoteState, middlewareList: List<IMiddleware<NoteState>>) :
+    StateManager<NoteState>(initialState, middlewareList.plus(DirectMiddleware())),
     KoinComponent {
     private val storage: IStorage by inject()
 
@@ -45,6 +43,7 @@ sealed class Action : IAction {
     object Load : Action()
     object ToggleClosedNotes : Action()
     object NewNote : Action()
+    object Cancel : Action()
     data class AddNote(val note: Note) : Action()
     data class ToggleNote(val note: Note) : Action()
 }

@@ -22,15 +22,20 @@ abstract class Processor<T>(private val stateManager: IStateManager<T>) : IProce
 
 abstract class StateManager<T>(
     initialState: T,
-    private val middlewareList: List<IMiddleware<T>> = listOf(DirectMiddleware())
+    middlewareList: List<IMiddleware<T>> = listOf(DirectMiddleware())
 ) : IStateManager<T> {
     protected val state = MutableStateFlow(initialState)
+    private val middlewares: MutableList<IMiddleware<T>> = middlewareList.toMutableList()
+
+    fun addMiddleware(middleware: IMiddleware<T>) {
+        middlewares.add(middleware)
+    }
 
     protected abstract val processor: IProcessor<T>
 
     override fun listen() = state
 
     override fun process(action: IAction) {
-        middlewareList.forEach { it.process(action, state.value, processor) }
+        middlewares.forEach { it.process(action, state.value, processor) }
     }
 }

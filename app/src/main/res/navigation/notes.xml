@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/notes"
+    app:startDestination="@id/noteListScreen">
+
+    <screen_view
+        android:id="@+id/noteListScreen"
+        android:name="dev.amaro.sonic.app.samples.notes.NoteListScreen"
+        android:label="NoteListScreen"
+        app:layoutId="@layout/screen_note_list">
+        <action
+            android:id="@+id/action_noteListScreen_to_createNoteScreen"
+            app:destination="@id/createNoteScreen" />
+    </screen_view>
+    <screen_view
+        android:id="@+id/createNoteScreen"
+        android:name="dev.amaro.sonic.app.samples.notes.CreateNoteScreen"
+        android:label="CreateNoteScreen"
+        app:layoutId="@layout/screen_new_note">
+        <action
+            android:id="@+id/action_createNoteScreen_to_noteListScreen"
+            app:destination="@id/noteListScreen" />
+    </screen_view>
+</navigation>

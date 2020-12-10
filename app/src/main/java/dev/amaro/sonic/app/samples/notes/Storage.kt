@@ -24,19 +24,19 @@ class PrefsStorage(context: Context) : IStorage {
     override fun save(note: Note) {
         val list = list().toMutableList().plus(note)
         val json = serializer.toJson(list)
-        sharedPrefs.edit().putString("ITEMS", json).apply()
+        sharedPrefs.edit().putString("ITEMS", json).commit()
     }
 
     override fun update(note: Note) {
         val list = list().toMutableList().minus(note).plus(note.copy(done = !note.done))
         val json = serializer.toJson(list)
-        sharedPrefs.edit().putString("ITEMS", json).apply()
+        sharedPrefs.edit().putString("ITEMS", json).commit()
     }
 
     override fun delete(note: Note) {
         val list = list().toMutableList().minus(note)
         val json = serializer.toJson(list)
-        sharedPrefs.edit().putString("ITEMS", json).apply()
+        sharedPrefs.edit().putString("ITEMS", json).commit()
     }
 
     private inline fun <reified T> Gson.fromJson(json: String) =

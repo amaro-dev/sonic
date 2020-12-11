@@ -18,15 +18,17 @@ import dev.amaro.sonic.IRenderer
 import dev.amaro.sonic.Screen
 import dev.amaro.sonic.app.R
 import dev.amaro.sonic.app.clicks
+import dev.amaro.sonic.app.inject
+import dev.amaro.sonic.app.loadDrawable
 import dev.amaro.sonic.collectOn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.onEach
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import kotlinx.coroutines.runBlocking
+import org.koin.core.parameter.parametersOf
+
 
 class NoteScreen(
     renderer: IRenderer<NoteState>,
@@ -42,51 +44,61 @@ class NoteListScreen @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = -1
-) : ConstraintLayout(context, attrs, defStyleAttr), IRenderer<NoteState>, KoinComponent {
+) : ConstraintLayout(context, attrs, defStyleAttr), IRenderer<NoteState> {
 
     private val buttonNew: FloatingActionButton
     private val listNotes: RecyclerView
+    private val screen: NoteScreen by inject { parametersOf(this as IRenderer<NoteState>) }
+    private val adapter: NoteAdapter
 
     init {
         LayoutInflater.from(context).inflate(R.layout.screen_note_list, this)
         buttonNew = findViewById(R.id.buttonNew)
         listNotes = findViewById(R.id.listNotes)
-        NoteScreen(this, get())
-
+        buttonNew.clicks()
+            .onEach { screen.perform(Action.NewNote) }
+            .collectOn(Dispatchers.Main) {}
+        listNotes.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        adapter = NoteAdapter(mutableListOf()).apply {
+            onClick()
+                .onEach { screen.perform(Action.ToggleNote(it)) }
+                .collectOn(Dispatchers.Main) {}
+        }
+        listNotes.adapter = adapter
+        screen.run { }
     }
 
     override fun render(state: NoteState, performer: IPerformer<NoteState>) {
-        println(state.notes)
-        buttonNew.clicks()
-            .onEach { performer.perform(Action.NewNote) }
-            .collectOn(Dispatchers.Main) {}
-        listNotes.adapter = NoteAdapter(state.notes).apply {
-            onClick()
-                .onEach { performer.perform(Action.ToggleNote(it)) }
-                .collectOn(Dispatchers.Main) {}
-        }
-        listNotes.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        adapter.update(state.notes)
     }
 }
 
-class NoteAdapter(private val items: List<Note>) : RecyclerView.Adapter<NoteAdapter.NoteItem>() {
+class NoteAdapter(private val items: MutableList<Note>) :
+    RecyclerView.Adapter<NoteAdapter.NoteItem>() {
 
-    private val publisher: BroadcastChannel<Note> = BroadcastChannel<Note>(1)
+    private val publisher: MutableSharedFlow<Note> = MutableSharedFlow(1)
+
+    fun update(newItems: List<Note>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
 
     fun onClick(): Flow<Note> {
-        return publisher.asFlow()
+        return publisher
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteItem {
         val checkedTextView = CheckedTextView(parent.context)
-        checkedTextView.checkMarkDrawable =
-            parent.context.resources.getDrawable(R.drawable.ic_check)
-        checkedTextView.setPadding(24)
-        checkedTextView.gravity = Gravity.CENTER
-        checkedTextView.layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
+        checkedTextView.run {
+            checkMarkDrawable = loadDrawable(R.drawable.ic_check)
+            setPadding(24)
+            gravity = Gravity.CENTER
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
         return NoteItem(checkedTextView)
     }
 
@@ -101,8 +113,7 @@ class NoteAdapter(private val items: List<Note>) : RecyclerView.Adapter<NoteAdap
             (itemView as CheckedTextView).apply {
                 text = note.title
                 isChecked = note.done
-                setOnClickListener { publisher.offer(note) }
-
+                setOnClickListener { runBlocking { publisher.emit(note) } }
             }
 
         }

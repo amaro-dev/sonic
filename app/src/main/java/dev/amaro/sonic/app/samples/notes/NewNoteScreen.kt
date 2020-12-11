@@ -11,12 +11,12 @@ import dev.amaro.sonic.IRenderer
 import dev.amaro.sonic.Screen
 import dev.amaro.sonic.app.R
 import dev.amaro.sonic.app.clicks
+import dev.amaro.sonic.app.inject
 import dev.amaro.sonic.collectOn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onEach
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.get
+import org.koin.core.parameter.parametersOf
 
 class NewNoteScreen(
     renderer: IRenderer<NoteState>,
@@ -28,26 +28,28 @@ class CreateNoteScreen @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = -1
-) : ConstraintLayout(context, attrs, defStyleAttr), IRenderer<NoteState>, KoinComponent {
+) : ConstraintLayout(context, attrs, defStyleAttr), IRenderer<NoteState> {
 
     private val buttonSave: Button
     private val buttonCancel: Button
     private val textNoteDescription: TextInputLayout
+    private val screen: NewNoteScreen by inject { parametersOf(this) }
 
     init {
         LayoutInflater.from(context).inflate(R.layout.screen_new_note, this)
         buttonSave = findViewById(R.id.buttonSave)
         buttonCancel = findViewById(R.id.buttonCancel)
         textNoteDescription = findViewById(R.id.fieldNote)
-        NewNoteScreen(this, get())
+        buttonSave.clicks()
+            .onEach { screen.perform(Action.AddNote(Note(textNoteDescription.text, false))) }
+            .collectOn(Dispatchers.Main) {}
+        buttonCancel.clicks()
+            .collectOn(Dispatchers.Main) { screen.perform(Action.Cancel) }
+        screen.run { }
     }
 
     override fun render(state: NoteState, performer: IPerformer<NoteState>) {
-        buttonSave.clicks()
-            .onEach { performer.perform(Action.AddNote(Note(textNoteDescription.text, false))) }
-            .collectOn(Dispatchers.Main) {}
-        buttonCancel.clicks()
-            .collectOn(Dispatchers.Main) { performer.perform(Action.Cancel) }
+
     }
 }
 

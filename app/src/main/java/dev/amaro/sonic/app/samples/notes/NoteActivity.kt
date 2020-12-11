@@ -18,14 +18,19 @@ class NoteActivity : AppCompatActivity() {
     private lateinit var navController: NavController
 
     private val router = object : Router {
+        private val map = HashMap<Int, View?>()
         override fun routeTo(destination: ViewDestination): View? = routeTo(destination.layoutId)
 
-        override fun routeTo(destinationId: Int): View? =
-            when (destinationId) {
-                R.layout.screen_note_list -> NoteListScreen(this@NoteActivity)
-                R.layout.screen_new_note -> CreateNoteScreen(this@NoteActivity)
-                else -> null
-            }
+        override fun routeTo(destinationId: Int): View? {
+            map[destinationId] = map[destinationId] ?: mapping(destinationId)
+            return map[destinationId]
+        }
+
+        private fun mapping(destinationId: Int): View? = when (destinationId) {
+            R.layout.screen_note_list -> NoteListScreen(this@NoteActivity)
+            R.layout.screen_new_note -> CreateNoteScreen(this@NoteActivity)
+            else -> null
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

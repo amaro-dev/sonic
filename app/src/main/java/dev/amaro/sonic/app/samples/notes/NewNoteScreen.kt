@@ -51,6 +51,11 @@ class CreateNoteScreen @JvmOverloads constructor(
     override fun render(state: NoteState, performer: IPerformer<NoteState>) {
 
     }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        screen.dispose()
+    }
 }
 
 val TextInputLayout.text: String

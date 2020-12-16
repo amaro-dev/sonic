@@ -1,7 +1,6 @@
 package dev.amaro.sonic.app.samples.notes
 
 import android.content.Context
-import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -41,10 +40,8 @@ class NoteScreen(
 }
 
 class NoteListScreen @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = -1
-) : ConstraintLayout(context, attrs, defStyleAttr), IRenderer<NoteState> {
+    context: Context
+) : ConstraintLayout(context, null, -1), IRenderer<NoteState> {
 
     private val buttonNew: FloatingActionButton
     private val listNotes: RecyclerView
@@ -61,7 +58,7 @@ class NoteListScreen @JvmOverloads constructor(
         listNotes.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         adapter = NoteAdapter(mutableListOf()).apply {
             onClick()
-                .onEach { screen.perform(Action.ToggleNote(it)) }
+                .onEach { screen.perform(it) }
                 .collectOn(Dispatchers.Main) {}
         }
         listNotes.adapter = adapter
@@ -71,12 +68,17 @@ class NoteListScreen @JvmOverloads constructor(
     override fun render(state: NoteState, performer: IPerformer<NoteState>) {
         adapter.update(state.notes)
     }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        screen.dispose()
+    }
 }
 
 class NoteAdapter(private val items: MutableList<Note>) :
     RecyclerView.Adapter<NoteAdapter.NoteItem>() {
 
-    private val publisher: MutableSharedFlow<Note> = MutableSharedFlow(1)
+    private val publisher: MutableSharedFlow<Action> = MutableSharedFlow(1)
 
     fun update(newItems: List<Note>) {
         items.clear()
@@ -84,7 +86,7 @@ class NoteAdapter(private val items: MutableList<Note>) :
         notifyDataSetChanged()
     }
 
-    fun onClick(): Flow<Note> {
+    fun onClick(): Flow<Action> {
         return publisher
     }
 
@@ -113,7 +115,11 @@ class NoteAdapter(private val items: MutableList<Note>) :
             (itemView as CheckedTextView).apply {
                 text = note.title
                 isChecked = note.done
-                setOnClickListener { runBlocking { publisher.emit(note) } }
+                setOnClickListener { runBlocking { publisher.emit(Action.ToggleNote(note)) } }
+                setOnLongClickListener {
+                    runBlocking { publisher.emit(Action.DeleteNote(note)) }
+                    true
+                }
             }
 
         }

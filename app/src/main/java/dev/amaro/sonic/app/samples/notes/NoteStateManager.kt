@@ -36,6 +36,13 @@ class NoteStateManager(initialState: NoteState, middlewareList: List<IMiddleware
                             .sortedBy { it.title },
                     )
                 }
+                is Action.DeleteNote -> {
+                    storage.delete(action.note)
+                    state.value = state.value.copy(
+                        notes = storage.list().filter { !state.value.showOnlyOpen || !it.done }
+                            .sortedBy { it.title },
+                    )
+                }
             }
         }
     }
@@ -47,5 +54,6 @@ sealed class Action : IAction {
     object NewNote : Action()
     object Cancel : Action()
     data class AddNote(val note: Note) : Action()
+    data class DeleteNote(val note: Note) : Action()
     data class ToggleNote(val note: Note) : Action()
 }

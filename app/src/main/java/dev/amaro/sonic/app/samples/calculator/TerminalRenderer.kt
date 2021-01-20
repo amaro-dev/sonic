@@ -18,7 +18,7 @@ class TerminalRenderer : IRenderer<Calculator.State> {
                 println("Enter the second number: ")
                 performer.perform(Calculator.Action.SecondNumber(readLine()?.toInt() ?: 0))
             }
-            else -> {
+            state.result != null -> {
                 println("The result is: ${state.firstNumber} ${state.operation.symbol} ${state.secondNumber} = ${state.result}")
                 println("Press enter to restart")
                 readLine()

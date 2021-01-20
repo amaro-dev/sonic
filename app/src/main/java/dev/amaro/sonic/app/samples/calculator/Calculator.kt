@@ -26,12 +26,13 @@ object Calculator {
             if (action is Action.SecondNumber || action is Action.FirstNumber || action is Action.Restart) {
                 processor.reduce(action)
             }
-            if (state.firstNumber != null && state.secondNumber != null && state.operation != null) {
+            if (state.firstNumber != null && (state.secondNumber != null || action is Action.SecondNumber) && state.operation != null) {
+                val secondNumber = (state.secondNumber ?: (action as Action.SecondNumber).number)
                 val result = when (state.operation) {
-                    Operation.Add -> state.firstNumber + state.secondNumber
-                    Operation.Multiply -> state.firstNumber * state.secondNumber
-                    Operation.Subtract -> state.firstNumber - state.secondNumber
-                    Operation.Division -> state.firstNumber / state.secondNumber
+                    Operation.Add -> state.firstNumber + secondNumber
+                    Operation.Multiply -> state.firstNumber * secondNumber
+                    Operation.Subtract -> state.firstNumber - secondNumber
+                    Operation.Division -> state.firstNumber / secondNumber
                 }
                 processor.reduce(Action.SetResult(result))
             }

@@ -1,0 +1,45 @@
+apply plugin: 'jacoco'
+
+def androidExclusion = [
+        '**/databinding/**/*.*',
+        '**/android/databinding/*Binding.*',
+        '**/BR.*',
+        '**/R.*',
+        '**/R$*.*',
+        '**/BuildConfig.*',
+        '**/Manifest*.*',
+        '**/*_MembersInjector.*',
+        '**/Dagger*Component.*',
+        '**/Dagger*Component$Builder.*',
+        '**/*Module_*Factory.*',
+        '**/*Fragment*.*',
+        '**/*Activity*.*',
+        '**/*Adapter*.*',
+        '**/*ViewPager*.*',
+        '**/*ViewHolder*.*',
+        '**/*Module*.*'
+]
+
+jacoco {
+    toolVersion = jacocoSetup.version
+}
+
+
+task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    classDirectories.setFrom(fileTree(
+            dir: "${projectDir}/../${jacocoSetup.targetModule}/build/tmp/kotlin-classes/debug",
+            excludes: androidExclusion
+    ))
+    sourceDirectories.setFrom(files("../${jacocoSetup.targetModule}/src/main/java"))
+    executionData.setFrom(files('build/jacoco/testDebugUnitTest.exec'))
+
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}

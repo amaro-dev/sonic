@@ -1,5 +1,22 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
+    def props = new Properties()
+    def propsFile = new File('local.properties')
+    if (propsFile.exists()) {
+        new File('local.properties').withInputStream {
+            props.load(it)
+        }
+    }
+    ext.jacocoSetup = new Properties()
+    ext.jacocoSetup['version'] = "0.8.5"
+    ext.jacocoSetup['targetModule'] = "navigation"
+    ext.sonarSetup = new Properties()
+    ext.sonarSetup['version'] = '2.8'
+    ext.sonarSetup['projectName'] = 'View Navigation Library'
+    ext.sonarSetup['projectKey'] = System.env.SONARPROJECTKEY ?: props.getProperty("sonar.projectKey") ?: ""
+    ext.sonarSetup['organizationId'] = System.env.SONARORGANIZATIONID ?: props.getProperty("sonar.organizationId") ?: ""
+    ext.sonarSetup['token'] = System.env.SONARTOKEN ?: props.getProperty("sonar.token") ?: ""
+
     ext.kotlin_version = "1.4.21"
     ext.koin_version = "2.2.1"
     repositories {
@@ -9,7 +26,8 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
+        classpath "org.jacoco:org.jacoco.core:${jacocoSetup.version}"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:${sonarSetup.version}"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

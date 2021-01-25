@@ -9,10 +9,10 @@ buildscript {
     }
     ext.jacocoSetup = new Properties()
     ext.jacocoSetup['version'] = "0.8.5"
-    ext.jacocoSetup['targetModule'] = "navigation"
+    ext.jacocoSetup['targetModule'] = "library"
     ext.sonarSetup = new Properties()
     ext.sonarSetup['version'] = '2.8'
-    ext.sonarSetup['projectName'] = 'View Navigation Library'
+    ext.sonarSetup['projectName'] = 'Sonic'
     ext.sonarSetup['projectKey'] = System.env.SONARPROJECTKEY ?: props.getProperty("sonar.projectKey") ?: ""
     ext.sonarSetup['organizationId'] = System.env.SONARORGANIZATIONID ?: props.getProperty("sonar.organizationId") ?: ""
     ext.sonarSetup['token'] = System.env.SONARTOKEN ?: props.getProperty("sonar.token") ?: ""

@@ -40,6 +40,27 @@ ext.deploy.address = new Properties()
 ext.deploy.address.release = project.findProperty("publish.address.release") ?: System.getenv('PUBLISH_ADDRESS_RELEASE') ?: ""
 ext.deploy.address.snapshot = project.findProperty("publish.address.snapshot") ?: System.getenv('PUBLISH_ADDRESS_SNAPSHOT') ?: ""
 
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+
+signing {
+    sign publishing.publications
+}
+
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
 publishing {
     publications {
         library(MavenPublication) {
@@ -84,15 +105,6 @@ publishing {
     }
 }
 
-signing {
-    sign publishing.publications
-}
-
-javadoc {
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
-    }
-}
 
 task publishLocal
 publishLocal.dependsOn 'publish'

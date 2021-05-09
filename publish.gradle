@@ -40,11 +40,6 @@ ext.deploy.address = new Properties()
 ext.deploy.address.release = project.findProperty("publish.address.release") ?: System.getenv('PUBLISH_ADDRESS_RELEASE') ?: ""
 ext.deploy.address.snapshot = project.findProperty("publish.address.snapshot") ?: System.getenv('PUBLISH_ADDRESS_SNAPSHOT') ?: ""
 
-
-def pomConfig = {
-
-}
-
 publishing {
     publications {
         library(MavenPublication) {
@@ -52,24 +47,26 @@ publishing {
             groupId pack.group
             artifactId pack.artifact
             version pack.version
-            pomConfig {
+            pom {
+                description = pack.description
+                name = pack.name
+                url = pack.scm
                 licenses {
                     license {
-                        name "The Apache Software License, Version 2.0"
-                        url "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                        distribution "repo"
+                        name = "The Apache Software License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        distribution = "repo"
                     }
                 }
                 developers {
                     developer {
-                        id developer.id
-                        name developer.name
-                        email developer.email
+                        id = developer.id
+                        name = developer.name
+                        email =developer.email
                     }
                 }
-
                 scm {
-                    url pack.scm
+                    url = pack.scm
                 }
             }
 
@@ -87,10 +84,15 @@ publishing {
     }
 }
 
-//signing {
-//    sign publishing.publications
-//}
+signing {
+    sign publishing.publications
+}
 
+javadoc {
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
 
 task publishLocal
 publishLocal.dependsOn 'publish'

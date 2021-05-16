@@ -4,6 +4,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 interface IAction
 
+interface IReducer<T> {
+    fun reduce(action: IAction, currentState: T): T
+}
+
 interface IProcessor<T> {
     fun perform(action: IAction)
     fun reduce(action: IAction)
@@ -11,19 +15,19 @@ interface IProcessor<T> {
 
 interface IStateManager<T> {
     fun listen(): MutableStateFlow<T>
-    fun process(action: IAction)
+    fun perform(action: IAction)
 }
 
 abstract class Processor<T>(private val stateManager: IStateManager<T>) : IProcessor<T> {
     override fun perform(action: IAction) {
-        stateManager.process(action)
+        stateManager.perform(action)
     }
 }
 
 abstract class StateManager<T>(
     initialState: T,
     middlewareList: List<IMiddleware<T>> = listOf(DirectMiddleware())
-) : IStateManager<T> {
+) : IStateManager<T>, IProcessor<T> {
     protected val state = MutableStateFlow(initialState)
     private val middlewares: MutableList<IMiddleware<T>> = middlewareList.toMutableList()
 
@@ -31,11 +35,15 @@ abstract class StateManager<T>(
         middlewares.add(middleware)
     }
 
-    protected abstract val processor: IProcessor<T>
+    protected abstract val reducer: IReducer<T>
 
     override fun listen() = state
 
-    override fun process(action: IAction) {
-        middlewares.forEach { it.process(action, state.value, processor) }
+    override fun reduce(action: IAction) {
+        state.value = reducer.reduce(action, state.value)
+    }
+
+    override fun perform(action: IAction) {
+        middlewares.forEach { it.process(action, state.value, this) }
     }
 }

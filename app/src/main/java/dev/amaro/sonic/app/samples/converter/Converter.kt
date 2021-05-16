@@ -24,23 +24,23 @@ object Converter {
                 ConversionCalculator()
             )
         ) {
-        override val processor: IProcessor<State> = object : Processor<State>(this) {
-            override fun reduce(action: IAction) {
-                state.value = when (action) {
-                    is Action.SetSource -> state.value.copy(source = action.currency)
-                    is Action.SetTarget -> state.value.copy(target = action.currency)
-                    is Action.SetAmount -> state.value.copy(amount = action.amount.toBigDecimal())
-                    is Action.SetResult -> state.value.copy(
+        override val reducer: IReducer<State> = object : IReducer<State> {
+            override fun reduce(action: IAction, currentState: Converter.State): Converter.State {
+                return when (action) {
+                    is Action.SetSource -> currentState.copy(source = action.currency)
+                    is Action.SetTarget -> currentState.copy(target = action.currency)
+                    is Action.SetAmount -> currentState.copy(amount = action.amount.toBigDecimal())
+                    is Action.SetResult -> currentState.copy(
                         result = action.amount?.setScale(
                             2,
                             RoundingMode.HALF_UP
                         )
                     )
-                    is Action.SwitchCurrencies -> state.value.copy(
+                    is Action.SwitchCurrencies -> currentState.copy(
                         source = state.value.target,
                         target = state.value.source
                     )
-                    else -> state.value
+                    else -> currentState
                 }
             }
         }

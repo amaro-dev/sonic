@@ -12,17 +12,27 @@
         <activity
             android:name="dev.amaro.sonic.app.samples.converter.ConverterActivity"
             android:label="@string/title_activity_converter"
+            android:exported="true"
             android:theme="@style/Theme.Sonic.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name="dev.amaro.sonic.app.samples.calculator.MainActivity">
+        <activity
+            android:exported="true"
+            android:name="dev.amaro.sonic.app.samples.calculator.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name="dev.amaro.sonic.app.samples.notes.NoteActivity">
+        <activity
+            android:exported="true"
+            android:name="dev.amaro.sonic.app.samples.notes.NoteActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".samples.calculator.ComposeActivity" android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>

@@ -3,10 +3,6 @@ package dev.amaro.sonic
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 
-interface IPerformer<T> {
-    fun perform(action: IAction)
-}
-
 abstract class Screen<T>(
     state: StateManager<T>,
     renderer: IRenderer<T> = IRenderer.Nothing(),
@@ -35,9 +31,3 @@ abstract class Screen<T>(
     }
 }
 
-interface IRenderer<T> {
-    fun render(state: T, performer: IPerformer<T>)
-    class Nothing<T> : IRenderer<T> {
-        override fun render(state: T, performer: IPerformer<T>) = Unit
-    }
-}

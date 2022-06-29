@@ -17,7 +17,7 @@ buildscript {
     ext.sonarSetup['organizationId'] = System.env.SONARORGANIZATIONID ?: props.getProperty("sonar.organizationId") ?: ""
     ext.sonarSetup['token'] = System.env.SONARTOKEN ?: props.getProperty("sonar.token") ?: ""
 
-    ext.kotlin_version = "1.6.10"
+    ext.kotlin_version = "1.6.21"
     ext.koin_version = "2.2.2"
     ext.compose_version = "1.1.1"
     repositories {

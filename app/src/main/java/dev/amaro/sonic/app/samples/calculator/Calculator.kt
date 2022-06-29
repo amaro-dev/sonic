@@ -41,17 +41,18 @@ object Calculator {
 
     class SimpleStateManager :
         StateManager<State>(State(), listOf(OperationParser(), Calculation())) {
-        override val processor: IProcessor<State> = object : Processor<State>(this) {
-            override fun reduce(action: IAction) {
-                state.value = when (action) {
-                    is Action.FirstNumber -> state.value.copy(firstNumber = action.number)
-                    is Action.SecondNumber -> state.value.copy(secondNumber = action.number)
-                    is Action.SetResult -> state.value.copy(result = action.number)
-                    is Action.OperationCommand -> state.value.copy(operation = action.operation)
+        override val reducer: IReducer<State> = object : IReducer<State> {
+            override fun reduce(action: IAction, currentState: State): State {
+                return when (action) {
+                    is Action.FirstNumber -> currentState.copy(firstNumber = action.number)
+                    is Action.SecondNumber -> currentState.copy(secondNumber = action.number)
+                    is Action.SetResult -> currentState.copy(result = action.number)
+                    is Action.OperationCommand -> currentState.copy(operation = action.operation)
                     is Action.Restart -> State()
                     else -> State()
                 }
             }
+
         }
     }
 

@@ -23,7 +23,7 @@ abstract class Screen<T>(
     override fun render(state: T, performer: IPerformer<T>) = Unit
 
     override fun perform(action: IAction) {
-        stateManager.process(action)
+        stateManager.perform(action)
     }
 
     fun dispose() {

@@ -1,34 +1,9 @@
 plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+    id 'java-library'
+    id 'kotlin'
 }
 
-android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
 
-    defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 31
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-}
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -38,4 +13,11 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.4")
 }
 
-apply from: 'https://gist.githubusercontent.com/RodrigoAmaroEng/311aea4b8d263f1b7b4dc02f65de9151/raw/a77150e72ea0e9729293bcb8ad3ca20f56c449fc/publish.gradle'
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+//apply from: 'https://gist.githubusercontent.com/RodrigoAmaroEng/311aea4b8d263f1b7b4dc02f65de9151/raw/a77150e72ea0e9729293bcb8ad3ca20f56c449fc/publish.gradle'
+apply from: '../publish.gradle'
+

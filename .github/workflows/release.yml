@@ -35,7 +35,7 @@ jobs:
         shell: bash
         run: |
           releaseBranch=$(git rev-parse --abbrev-ref HEAD | sed 's/.*\-\(.*\)/\1/')
-          commits=$(git rev-list --count refs/remotes/origin/$releaseBranch..HEAD)
+          commits=$(git rev-list --count refs/remotes/origin/main..$releaseBranch)
           echo "FIX_NUMBER=$commits" >> $GITHUB_ENV
           echo "::set-output name=release_branch::$releaseBranch"
 
@@ -80,14 +80,6 @@ jobs:
         with:
           tag_name: ${{ steps.manager.outputs.version_name }}
           release_name: ${{ steps.manager.outputs.version_name }}
-
-      - name: Tag release
-        shell: bash
-        env:
-          VERSION: ${{ steps.release.outputs.release_branch }}
-        run: |
-          git tag $VERSION
-          git push origin $VERSION
 
       - name: Remove GPG file
         shell: bash

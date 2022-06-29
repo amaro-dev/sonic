@@ -9,40 +9,41 @@ class NoteStateManager(initialState: NoteState, middlewareList: List<IMiddleware
     KoinComponent {
     private val storage: IStorage by inject()
 
-    override val processor: IProcessor<NoteState> = object : Processor<NoteState>(this) {
-        override fun reduce(action: IAction) {
-            when (action) {
+    override val reducer: IReducer<NoteState> = object : IReducer<NoteState> {
+        override fun reduce(action: IAction, currentState: NoteState): NoteState {
+            return when (action) {
                 is Action.Load -> {
-                    state.value = NoteState(storage.list().sortedBy { it.title })
+                    NoteState(storage.list().sortedBy { it.title })
                 }
                 is Action.ToggleClosedNotes -> {
-                    val flag = !state.value.showOnlyOpen
-                    state.value = state.value.copy(
+                    val flag = !currentState.showOnlyOpen
+                    currentState.copy(
                         notes = storage.list().filter { !flag || !it.done }.sortedBy { it.title },
                         showOnlyOpen = flag
                     )
                 }
                 is Action.ToggleNote -> {
                     storage.update(action.note)
-                    state.value = state.value.copy(
-                        notes = storage.list().filter { !state.value.showOnlyOpen || !it.done }
+                    currentState.copy(
+                        notes = storage.list().filter { !currentState.showOnlyOpen || !it.done }
                             .sortedBy { it.title },
                     )
                 }
                 is Action.AddNote -> {
                     storage.save(action.note)
-                    state.value = state.value.copy(
-                        notes = storage.list().filter { !state.value.showOnlyOpen || !it.done }
+                    currentState.copy(
+                        notes = storage.list().filter { !currentState.showOnlyOpen || !it.done }
                             .sortedBy { it.title },
                     )
                 }
                 is Action.DeleteNote -> {
                     storage.delete(action.note)
-                    state.value = state.value.copy(
-                        notes = storage.list().filter { !state.value.showOnlyOpen || !it.done }
+                    currentState.copy(
+                        notes = storage.list().filter { !currentState.showOnlyOpen || !it.done }
                             .sortedBy { it.title },
                     )
                 }
+                else -> currentState
             }
         }
     }

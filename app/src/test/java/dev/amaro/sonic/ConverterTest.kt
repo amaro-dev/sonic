@@ -27,7 +27,7 @@ class ConverterTest {
         val screen = Converter.Screen(renderer, dispatcher = dispatcher)
         screen.perform(Converter.Action.SetAmount("100,00"))
         verify {
-            renderer.render(Converter.State( amount = BigDecimal(100).setScale(2)), any())
+            renderer.render(Converter.State(amount = BigDecimal(100).setScale(2)), any())
         }
     }
 

@@ -1,6 +1,12 @@
 package dev.amaro.sonic.app.samples.calculator
 
-import dev.amaro.sonic.*
+import dev.amaro.sonic.IAction
+import dev.amaro.sonic.IMiddleware
+import dev.amaro.sonic.IProcessor
+import dev.amaro.sonic.IReducer
+import dev.amaro.sonic.IRenderer
+import dev.amaro.sonic.Screen
+import dev.amaro.sonic.StateManager
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
@@ -59,8 +65,7 @@ object Calculator {
     class SimpleScreen(
         renderer: IRenderer<State>,
         collectScope: CoroutineDispatcher = Dispatchers.Default
-    ) :
-        Screen<State>(SimpleStateManager(), renderer, collectScope)
+    ) : Screen<State>(SimpleStateManager(), renderer, collectScope)
 
     sealed class Action : IAction {
         object Restart : Action()

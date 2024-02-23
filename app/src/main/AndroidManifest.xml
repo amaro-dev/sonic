@@ -23,6 +23,7 @@
             android:name="dev.amaro.sonic.app.samples.calculator.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
             </intent-filter>
         </activity>
         <activity
@@ -30,6 +31,7 @@
             android:name="dev.amaro.sonic.app.samples.notes.NoteActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".samples.calculator.ComposeActivity" android:exported="true" >

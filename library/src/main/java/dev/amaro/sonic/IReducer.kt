@@ -1,4 +1,5 @@
 package dev.amaro.sonic
 
-class IReducer {
+interface IReducer<T> {
+    fun reduce(action: IAction, currentState: T): T
 }

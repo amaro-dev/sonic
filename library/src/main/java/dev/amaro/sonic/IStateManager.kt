@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface IStateManager<T> {
     fun listen(): StateFlow<T>
-    fun process(action: IAction)
+    fun perform(action: IAction)
 }

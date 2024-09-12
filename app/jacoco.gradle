@@ -26,10 +26,7 @@ jacoco {
 
 
 task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
+
     classDirectories.setFrom(fileTree(
             dir: "${projectDir}/../${jacocoSetup.targetModule}/build/tmp/kotlin-classes/debug",
             excludes: androidExclusion

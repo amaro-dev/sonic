@@ -100,7 +100,7 @@ class NoteTest : KoinTest {
         every { storage.list() } returns notes
         loadKoinModules(
             module {
-                single<IStorage>(override = true) { storage }
+                single<IStorage>() { storage }
             }
         )
 

@@ -19,6 +19,9 @@ abstract class StateManager<T>(
 
     override fun reduce(action: IAction) {
         state.value = reducer.reduce(action, state.value)
+        if (action is ISideEffectAction) {
+            perform(action.sideEffect)
+        }
     }
 
     override fun perform(action: IAction) {

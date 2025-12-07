@@ -2,6 +2,7 @@ package dev.amaro.sonic
 
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 class DirectMiddlewareTest {
@@ -10,7 +11,7 @@ class DirectMiddlewareTest {
     private val someString = ""
 
     @Test
-    fun `Perform any actions`() {
+    fun `Perform any actions`() = runTest {
         val processor: Processor<String> = mockk(relaxed = true)
         middleware.process(SampleActions.Action1, someString, processor)
         middleware.process(SampleActions.Action2, someString, processor)

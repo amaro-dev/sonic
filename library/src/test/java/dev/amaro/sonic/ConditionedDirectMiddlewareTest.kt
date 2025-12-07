@@ -2,6 +2,7 @@ package dev.amaro.sonic
 
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -16,7 +17,7 @@ class ConditionedDirectMiddlewareTest {
     private val someString = ""
 
     @Test
-    fun `Perform actions on the list`() {
+    fun `Perform actions on the list`() = runTest {
         val processor: Processor<String> = mockk(relaxed = true)
         middleware.process(SampleActions.Action1, someString, processor)
         middleware.process(SampleActions.Action2, someString, processor)
@@ -28,7 +29,7 @@ class ConditionedDirectMiddlewareTest {
 
 
     @Test
-    fun `Do not perform actions out of the list`() {
+    fun `Do not perform actions out of the list`() = runTest {
         val processor: Processor<String> = mockk(relaxed = true)
         middleware.process(SampleActions.Action3, someString, processor)
         verify(exactly = 0) {

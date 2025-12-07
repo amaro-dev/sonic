@@ -1,4 +1,4 @@
-package dev.amaro.sonic
+    package dev.amaro.sonic
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -7,11 +7,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 abstract class Screen<T>(
-    state: StateManager<T>,
+    private val stateManager: IStateManager<T>,
     renderer: IRenderer<T> = IRenderer.Nothing(),
     collectScope: CoroutineDispatcher = Dispatchers.Main
 ) : IPerformer<T>, IRenderer<T> {
-    private val stateManager: IStateManager<T> = state
     private val scopeJob: Job
 
     init {

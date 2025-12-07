@@ -1,13 +1,15 @@
 package dev.amaro.sonic
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 abstract class StateManager<T>(
     initialState: T,
-    middlewareList: List<IMiddleware<T>> = listOf(DirectMiddleware())
+    private val scope: CoroutineScope,
+    private val middlewares: MutableList<IMiddleware<T>> = mutableListOf(DirectMiddleware())
 ) : IStateManager<T>, IProcessor<T> {
     protected val state = MutableStateFlow(initialState)
-    private val middlewares: MutableList<IMiddleware<T>> = middlewareList.toMutableList()
 
     fun addMiddleware(middleware: IMiddleware<T>) {
         middlewares.add(middleware)
@@ -25,6 +27,8 @@ abstract class StateManager<T>(
     }
 
     override fun perform(action: IAction) {
-        middlewares.forEach { it.process(action, state.value, this) }
+        scope.launch {
+            middlewares.forEach { it.process(action, state.value, this@StateManager) }
+        }
     }
 }

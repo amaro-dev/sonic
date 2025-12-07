@@ -5,7 +5,7 @@ package dev.amaro.sonic
  * consuming APIs or heavy calculations
  */
 open class DirectMiddleware<T> : IMiddleware<T> {
-    override fun process(action: IAction, state: T, processor: IProcessor<T>) {
+    override suspend fun process(action: IAction, state: T, processor: IProcessor<T>) {
         processor.reduce(action)
     }
 }

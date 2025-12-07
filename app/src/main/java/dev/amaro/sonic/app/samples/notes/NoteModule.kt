@@ -6,8 +6,7 @@ import org.koin.dsl.module
 object NoteModule {
     val Instance = module {
         single<IStorage> { PrefsStorage(get()) }
-        single { listOf(Navigator(get())) }
-        single { NoteStateManager(NoteState(), get()) }
+        single { NoteStateManager() }
         factory { (renderer: IRenderer<NoteState>) -> NoteScreen(renderer, get()) }
         factory { (renderer: IRenderer<NoteState>) -> NewNoteScreen(renderer, get()) }
     }

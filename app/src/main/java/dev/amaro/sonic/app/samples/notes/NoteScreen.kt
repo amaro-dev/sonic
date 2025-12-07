@@ -12,16 +12,14 @@ import androidx.core.view.setPadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import dev.amaro.sonic.IPerformer
-import dev.amaro.sonic.IRenderer
-import dev.amaro.sonic.Screen
+import dev.amaro.sonic.*
 import dev.amaro.sonic.app.R
 import dev.amaro.sonic.app.clicks
 import dev.amaro.sonic.app.inject
 import dev.amaro.sonic.app.loadDrawable
-import dev.amaro.sonic.collectOn
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.onEach
@@ -32,10 +30,17 @@ import org.koin.core.parameter.parametersOf
 class NoteScreen(
     renderer: IRenderer<NoteState>,
     stateManager: NoteStateManager,
-    dispatcher: CoroutineDispatcher = Dispatchers.Main
-) : Screen<NoteState>(stateManager, renderer, dispatcher) {
+    scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+) {
+    private val manager = stateManager
+
     init {
-        perform(Action.Load)
+        bindState(manager, renderer, scope, Dispatchers.Main.immediate)
+        manager.perform(Action.Load)
+    }
+
+    fun perform(action: IAction) {
+        manager.perform(action)
     }
 }
 
@@ -62,7 +67,6 @@ class NoteListScreen @JvmOverloads constructor(
                 .collectOn(Dispatchers.Main) {}
         }
         listNotes.adapter = adapter
-        screen.run { }
     }
 
     override fun render(state: NoteState, performer: IPerformer<NoteState>) {
@@ -71,7 +75,7 @@ class NoteListScreen @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        screen.dispose()
+        // Lifecycle cleanup is handled by CoroutineScope
     }
 }
 

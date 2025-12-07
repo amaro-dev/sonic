@@ -1,19 +1,14 @@
 package dev.amaro.sonic.app.samples.calculator
 
-import dev.amaro.sonic.IAction
-import dev.amaro.sonic.IMiddleware
-import dev.amaro.sonic.IProcessor
-import dev.amaro.sonic.IReducer
-import dev.amaro.sonic.IRenderer
-import dev.amaro.sonic.Screen
-import dev.amaro.sonic.StateManager
-import kotlinx.coroutines.CoroutineDispatcher
+import dev.amaro.sonic.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 object Calculator {
 
     class OperationParser : IMiddleware<State> {
-        override fun process(action: IAction, state: State, processor: IProcessor<State>) {
+        override suspend fun process(action: IAction, state: State, processor: IProcessor<State>) {
             if (action is Action.OperationChoice) {
                 listOf(
                     Operation.Add,
@@ -28,7 +23,7 @@ object Calculator {
     }
 
     class Calculation : IMiddleware<State> {
-        override fun process(action: IAction, state: State, processor: IProcessor<State>) {
+        override suspend fun process(action: IAction, state: State, processor: IProcessor<State>) {
             if (action is Action.SecondNumber || action is Action.FirstNumber || action is Action.Restart) {
                 processor.reduce(action)
             }
@@ -45,8 +40,15 @@ object Calculator {
         }
     }
 
-    class SimpleStateManager :
-        StateManager<State>(State(), listOf(OperationParser(), Calculation())) {
+    class SimpleStateManager(
+        scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    ) :
+        StateManager<State>(State(), scope) {
+        init {
+            addMiddleware(OperationParser())
+            addMiddleware(Calculation())
+        }
+
         override val reducer: IReducer<State> = object : IReducer<State> {
             override fun reduce(action: IAction, currentState: State): State {
                 return when (action) {
@@ -64,8 +66,18 @@ object Calculator {
 
     class SimpleScreen(
         renderer: IRenderer<State>,
-        collectScope: CoroutineDispatcher = Dispatchers.Default
-    ) : Screen<State>(SimpleStateManager(), renderer, collectScope)
+        scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    ) {
+        private val manager = SimpleStateManager(scope)
+
+        init {
+            bindState(manager, renderer, scope)
+        }
+
+        fun perform(action: IAction) {
+            manager.perform(action)
+        }
+    }
 
     sealed class Action : IAction {
         object Restart : Action()

@@ -7,7 +7,9 @@ import dev.amaro.sonic.app.samples.notes.*
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -23,8 +25,6 @@ import org.koin.test.get
 
 @RunWith(AndroidJUnit4::class)
 class NoteTest : KoinTest {
-
-    private val dispatcher = TestCoroutineDispatcher()
 
     private val oneTodo = listOf(Note("Task 1", false))
     private val oneTodoAndOneClosed = listOf(
@@ -52,7 +52,8 @@ class NoteTest : KoinTest {
     fun `Load saved notes on start`() {
         setNotesOnStorage(oneTodoAndOneClosed)
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        NoteScreen(renderer, get(), dispatcher = dispatcher)
+        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+        NoteScreen(renderer, get(), scope)
         renderer.verifyState(NoteState(oneTodoAndOneClosed))
     }
 
@@ -60,7 +61,8 @@ class NoteTest : KoinTest {
     fun `Toggle closed notes`() {
         setNotesOnStorage(oneTodoAndOneClosed)
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val screen = NoteScreen(renderer, get(), dispatcher = dispatcher)
+        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+        val screen = NoteScreen(renderer, get(), scope)
         screen.perform(Action.ToggleClosedNotes)
         renderer.verifyState(NoteState(oneTodo, true))
     }
@@ -68,7 +70,8 @@ class NoteTest : KoinTest {
     @Test
     fun `Add new note`() {
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val screen = NoteScreen(renderer, get(), dispatcher = dispatcher)
+        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+        val screen = NoteScreen(renderer, get(), scope)
         screen.perform(Action.AddNote(Note("Task 1", false)))
         renderer.verifyState(NoteState(oneTodo, false))
     }
@@ -76,7 +79,8 @@ class NoteTest : KoinTest {
     @Test
     fun `Add two new notes`() {
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val screen = NoteScreen(renderer, get(), dispatcher = dispatcher)
+        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+        val screen = NoteScreen(renderer, get(), scope)
         screen.perform(Action.AddNote(Note("Task 1", false)))
         screen.perform(Action.AddNote(Note("Task 2", true)))
         renderer.verifyState(NoteState(oneTodoAndOneClosed, false))
@@ -85,7 +89,8 @@ class NoteTest : KoinTest {
     @Test
     fun `Toggle note`() {
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val screen = NoteScreen(renderer, get(), dispatcher = dispatcher)
+        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+        val screen = NoteScreen(renderer, get(), scope)
         screen.perform(Action.AddNote(Note("Task 1", false)))
         screen.perform(Action.ToggleNote(Note("Task 1", false)))
         renderer.verifyState(NoteState(listOf(Note("Task 1", true)), false))

@@ -1,8 +1,9 @@
 package dev.amaro.sonic.app.samples.converter
 
 import dev.amaro.sonic.*
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -11,19 +12,30 @@ object Converter {
     class Screen(
         renderer: IRenderer<State>,
         initialState: State = State(),
-        dispatcher: CoroutineDispatcher = Dispatchers.Main
-    ) :
-        dev.amaro.sonic.Screen<State>(SimpleStateManager(initialState), renderer, dispatcher)
+        scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    ) {
+        private val manager = SimpleStateManager(initialState, scope)
 
-    class SimpleStateManager(initialState: State) :
-        StateManager<State>(
-            initialState,
-            listOf(
-                AmountValidator(),
-                CurrencySelection(),
-                ConversionCalculator()
-            )
-        ) {
+        init {
+            bindState(manager, renderer, scope)
+        }
+
+        fun perform(action: IAction) {
+            manager.perform(action)
+        }
+    }
+
+    class SimpleStateManager(
+        initialState: State,
+        scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    ) :
+        StateManager<State>(initialState, scope) {
+        init {
+            addMiddleware(AmountValidator())
+            addMiddleware(CurrencySelection())
+            addMiddleware(ConversionCalculator())
+        }
+
         override val reducer: IReducer<State> = object : IReducer<State> {
             override fun reduce(action: IAction, currentState: Converter.State): Converter.State {
                 return when (action) {
@@ -47,7 +59,7 @@ object Converter {
     }
 
     class AmountValidator : IMiddleware<State> {
-        override fun process(action: IAction, state: State, processor: IProcessor<State>) {
+        override suspend fun process(action: IAction, state: State, processor: IProcessor<State>) {
             if (action is Action.SetAmount) {
                 if (action.amount.isEmpty()) {
                     processor.reduce(Action.SetAmount("1"))
@@ -60,7 +72,7 @@ object Converter {
     }
 
     class CurrencySelection : IMiddleware<State> {
-        override fun process(action: IAction, state: State, processor: IProcessor<State>) {
+        override suspend fun process(action: IAction, state: State, processor: IProcessor<State>) {
             if (action is Action.SetSource || action is Action.SetTarget || action is Action.SwitchCurrencies) {
                 processor.reduce(action)
                 processor.perform(Action.Refresh)
@@ -107,7 +119,7 @@ object Converter {
             Pair(Pair("CAD", "GBP"), BigDecimal("0.57756"))
         )
 
-        override fun process(action: IAction, state: State, processor: IProcessor<State>) {
+        override suspend fun process(action: IAction, state: State, processor: IProcessor<State>) {
             if (state.source != null && state.target != null) {
                 val result = rates[Pair(state.source, state.target)]?.multiply(state.amount)
                 processor.reduce(Action.SetResult(result))

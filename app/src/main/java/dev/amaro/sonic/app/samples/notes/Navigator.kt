@@ -7,7 +7,7 @@ import dev.amaro.sonic.IProcessor
 import dev.amaro.sonic.app.R
 
 class Navigator(private val navController: NavController) : IMiddleware<NoteState> {
-    override fun process(action: IAction, state: NoteState, processor: IProcessor<NoteState>) {
+    override suspend fun process(action: IAction, state: NoteState, processor: IProcessor<NoteState>) {
         when (action) {
             is Action.NewNote -> navController.navigate(R.id.createNoteScreen)
             is Action.AddNote -> navController.navigate(R.id.noteListScreen)

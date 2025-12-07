@@ -1,0 +1,220 @@
+{
+  "description": "Pre-approved actions agents can execute autonomously. All other actions require human approval.",
+  "version": "1.0",
+  "core_agent": {
+    "approved_without_review": [
+      "implement_private_middleware_class",
+      "optimize_internal_algorithm",
+      "fix_bug_maintaining_backward_compatibility",
+      "add_internal_utility_function",
+      "add_method_overload_backward_compatible",
+      "refactor_internal_implementation",
+      "optimize_performance_within_existing_contracts"
+    ],
+    "requires_human_review": [
+      "change_public_interface_signature",
+      "remove_public_function",
+      "break_backward_compatibility",
+      "add_new_public_parameter",
+      "change_public_method_behavior"
+    ]
+  },
+  "contract_agent": {
+    "approved_without_review": [
+      "add_deprecation_warning",
+      "add_new_interface_variant",
+      "design_backward_compatible_api_extension",
+      "suggest_migration_code_pattern",
+      "review_api_consistency",
+      "generate_api_documentation"
+    ],
+    "requires_human_review": [
+      "change_existing_interface_signature",
+      "remove_published_function",
+      "break_backward_compatibility",
+      "remove_deprecated_api",
+      "change_public_method_behavior"
+    ]
+  },
+  "quality_agent": {
+    "approved_without_review": [
+      "write_unit_test",
+      "write_integration_test",
+      "run_test_suite",
+      "run_performance_benchmark",
+      "generate_coverage_report",
+      "execute_ci_pipeline",
+      "report_test_failure",
+      "identify_untested_code_path",
+      "run_static_analysis",
+      "run_ktlint",
+      "run_sonarqube",
+      "block_pr_on_failing_tests",
+      "block_merge_on_coverage_drop"
+    ],
+    "requires_human_review": [
+      "skip_tests",
+      "reduce_coverage_threshold",
+      "disable_quality_gate",
+      "ignore_test_failure",
+      "skip_security_scanning"
+    ]
+  },
+  "integration_agent": {
+    "approved_without_review": [
+      "run_build",
+      "run_library_tests",
+      "run_app_tests",
+      "run_instrumented_tests",
+      "update_patch_dependency",
+      "update_minor_dependency",
+      "execute_ci_pipeline",
+      "run_ktlint_check",
+      "run_sonarqube_analysis",
+      "generate_build_report",
+      "publish_to_maven_central",
+      "create_github_release",
+      "tag_repository",
+      "run_pre_push_checks"
+    ],
+    "requires_human_review": [
+      "update_major_dependency",
+      "change_build_gradle_configuration",
+      "modify_release_process",
+      "change_publishing_target",
+      "disable_security_scanning",
+      "force_push_to_release_branch"
+    ]
+  },
+  "documentation_agent": {
+    "approved_without_review": [
+      "update_kdoc_comment",
+      "add_code_example",
+      "create_migration_guide",
+      "update_readme",
+      "update_changelog",
+      "create_platform_specific_guide",
+      "generate_architecture_documentation",
+      "update_sample_app_documentation",
+      "add_inline_code_comment",
+      "add_getting_started_guide",
+      "validate_example_compilation"
+    ],
+    "requires_human_review": [
+      "major_documentation_restructuring",
+      "remove_documentation_section",
+      "change_documentation_strategy",
+      "remove_migration_guide"
+    ]
+  },
+  "experience_agent": {
+    "approved_without_review": [
+      "improve_error_message",
+      "create_code_snippet",
+      "add_ide_configuration",
+      "improve_exception_message",
+      "create_sample_application",
+      "add_compiler_warning",
+      "design_builder_pattern",
+      "design_dsl",
+      "optimize_api_naming",
+      "create_quick_start_guide",
+      "improve_validation_message"
+    ],
+    "requires_human_review": [
+      "break_developer_workflow",
+      "add_external_tooling_dependency",
+      "major_api_change_for_ergonomics",
+      "remove_platform_support",
+      "change_supported_android_version"
+    ]
+  },
+  "evolution_agent": {
+    "approved_without_review": [
+      "track_deprecation_timeline",
+      "identify_refactoring_opportunity",
+      "migrate_internal_code_to_new_pattern",
+      "monitor_technical_debt_metrics",
+      "suggest_optimization",
+      "analyze_code_smell",
+      "create_refactoring_plan",
+      "suggest_modern_kotlin_idiom",
+      "track_version_migration_progress"
+    ],
+    "requires_human_review": [
+      "remove_deprecated_api",
+      "break_backward_compatibility",
+      "major_architectural_refactoring",
+      "change_public_api_surface",
+      "decide_on_deprecation_strategy"
+    ]
+  },
+  "global_rules": {
+    "all_agents_can_do": [
+      "read_any_file",
+      "search_codebase",
+      "analyze_code",
+      "generate_reports",
+      "ask_human_for_clarification",
+      "notify_other_agents",
+      "create_issue_for_follow_up",
+      "log_actions_to_audit_trail"
+    ],
+    "all_agents_cannot_do": [
+      "modify_guardrails_without_approval",
+      "skip_quality_gates",
+      "delete_important_files",
+      "force_push_to_main_branch",
+      "publish_without_testing",
+      "make_decisions_outside_scope"
+    ]
+  },
+  "quality_thresholds": {
+    "coverage_minimum": 85,
+    "test_pass_rate_minimum": 100,
+    "performance_regression_threshold": 10,
+    "sonarqube_quality_gate": "PASS",
+    "ktlint_violations": 0
+  },
+  "approval_levels": {
+    "critical_changes": {
+      "examples": [
+        "breaking API",
+        "security vulnerability fix",
+        "major version release"
+      ],
+      "approval_required_from": [
+        "human"
+      ],
+      "notification_to": [
+        "all_agents"
+      ]
+    },
+    "high_impact_changes": {
+      "examples": [
+        "deprecation policy",
+        "major dependency update",
+        "architectural decision"
+      ],
+      "approval_required_from": [
+        "human"
+      ],
+      "notification_to": [
+        "affected_agents"
+      ]
+    },
+    "routine_changes": {
+      "examples": [
+        "bug fix",
+        "test addition",
+        "documentation update"
+      ],
+      "approval_required_from": [
+        "none"
+      ],
+      "notification_to": [
+        "quality_agent"
+      ]
+    }
+  }
+}

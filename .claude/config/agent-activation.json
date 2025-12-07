@@ -1,0 +1,373 @@
+{
+  "description": "Event-to-agent activation mapping. Defines how agents self-activate based on triggers.",
+  "version": "1.0",
+  "file_triggers": {
+    "description": "Agents activated when specific files change",
+    "library_core_impl": {
+      "files": [
+        "library/src/main/java/dev/amaro/sonic/StateManager.kt",
+        "library/src/main/java/dev/amaro/sonic/Processor.kt",
+        "library/src/main/java/dev/amaro/sonic/*Middleware.kt",
+        "library/src/main/java/dev/amaro/sonic/Extensions.kt"
+      ],
+      "agents": [
+        "core",
+        "quality",
+        "documentation"
+      ],
+      "mode": "sequential"
+    },
+    "library_interfaces": {
+      "files": [
+        "library/src/main/java/dev/amaro/sonic/I*.kt"
+      ],
+      "agents": [
+        "contract",
+        "quality",
+        "documentation",
+        "evolution"
+      ],
+      "mode": "sequential"
+    },
+    "library_screen": {
+      "files": [
+        "library/src/main/java/dev/amaro/sonic/Screen.kt"
+      ],
+      "agents": [
+        "contract",
+        "quality",
+        "documentation",
+        "evolution"
+      ],
+      "mode": "sequential"
+    },
+    "library_tests": {
+      "files": [
+        "library/src/test/**/*Test.kt"
+      ],
+      "agents": [
+        "quality"
+      ],
+      "mode": "independent"
+    },
+    "app_samples": {
+      "files": [
+        "app/src/main/java/dev/amaro/sonic/app/samples/**/*.kt"
+      ],
+      "agents": [
+        "experience",
+        "quality",
+        "documentation"
+      ],
+      "mode": "parallel"
+    },
+    "app_tests": {
+      "files": [
+        "app/src/test/**/*Test.kt",
+        "app/src/androidTest/**/*Test.kt"
+      ],
+      "agents": [
+        "quality"
+      ],
+      "mode": "independent"
+    },
+    "build_config": {
+      "files": [
+        "build.gradle",
+        "library/build.gradle",
+        "app/build.gradle",
+        "gradle.properties"
+      ],
+      "agents": [
+        "integration"
+      ],
+      "mode": "independent"
+    },
+    "ci_workflows": {
+      "files": [
+        ".github/workflows/*.yml"
+      ],
+      "agents": [
+        "integration"
+      ],
+      "mode": "independent"
+    },
+    "docs_files": {
+      "files": [
+        "README.md",
+        "docs/*.md",
+        "CHANGELOG.md"
+      ],
+      "agents": [
+        "documentation"
+      ],
+      "mode": "independent"
+    }
+  },
+  "git_event_triggers": {
+    "description": "Agents activated on git events (GitHub, hooks, etc.)",
+    "pull_request_opened": {
+      "event": "pull_request.opened",
+      "agents": [
+        "quality",
+        "integration",
+        "documentation",
+        "contract"
+      ],
+      "mode": "parallel",
+      "description": "Full PR validation: tests + build + docs + API checks"
+    },
+    "pull_request_updated": {
+      "event": "pull_request.synchronize",
+      "agents": [
+        "quality",
+        "integration"
+      ],
+      "mode": "parallel",
+      "description": "Quick re-validation: tests + build"
+    },
+    "release_branch_pushed": {
+      "event": "push.tag:releases/*",
+      "agents": [
+        "evolution",
+        "contract",
+        "integration"
+      ],
+      "mode": "sequential",
+      "description": "Release workflow: finalize API, publish, create release"
+    },
+    "issue_opened": {
+      "event": "issues.opened",
+      "agents": [
+        "experience"
+      ],
+      "mode": "independent",
+      "description": "Triage issue: understand user need"
+    },
+    "issue_labeled_core_logic": {
+      "event": "issues.labeled:core-logic",
+      "agents": [
+        "core"
+      ],
+      "mode": "independent",
+      "description": "Core logic issue activated"
+    },
+    "issue_labeled_bug": {
+      "event": "issues.labeled:bug",
+      "agents": [
+        "quality",
+        "core"
+      ],
+      "mode": "sequential",
+      "description": "Bug: reproduce, fix, test"
+    },
+    "issue_labeled_usability": {
+      "event": "issues.labeled:usability",
+      "agents": [
+        "experience",
+        "documentation"
+      ],
+      "mode": "sequential",
+      "description": "Usability: improve DX, update docs"
+    }
+  },
+  "command_triggers": {
+    "description": "Agents activated via slash commands",
+    "implement_feature": {
+      "command": "/implement-feature",
+      "agents": [
+        "orchestrator"
+      ],
+      "mode": "orchestrated",
+      "description": "Implement complete feature (Core → Quality → Docs → Integration)"
+    },
+    "review_pr": {
+      "command": "/review-pr",
+      "agents": [
+        "quality",
+        "integration",
+        "documentation",
+        "contract"
+      ],
+      "mode": "parallel",
+      "description": "Comprehensive PR review"
+    },
+    "run_quality_gate": {
+      "command": "/run-quality-gate",
+      "agents": [
+        "quality"
+      ],
+      "mode": "independent",
+      "description": "Run tests, coverage, benchmarks"
+    },
+    "run_build": {
+      "command": "/run-build",
+      "agents": [
+        "integration"
+      ],
+      "mode": "independent",
+      "description": "Run full build"
+    },
+    "update_docs": {
+      "command": "/update-docs",
+      "agents": [
+        "documentation"
+      ],
+      "mode": "independent",
+      "description": "Update documentation"
+    },
+    "refactor": {
+      "command": "/refactor",
+      "agents": [
+        "evolution"
+      ],
+      "mode": "independent",
+      "description": "Identify and plan refactoring"
+    },
+    "release": {
+      "command": "/release",
+      "agents": [
+        "evolution",
+        "contract",
+        "integration"
+      ],
+      "mode": "sequential",
+      "description": "Execute release workflow"
+    },
+    "orchestrate": {
+      "command": "/orchestrate",
+      "agents": [
+        "orchestrator"
+      ],
+      "mode": "orchestrated",
+      "description": "Orchestrate complex multi-agent task"
+    }
+  },
+  "scheduled_triggers": {
+    "description": "Agents activated on schedule",
+    "daily_dependency_check": {
+      "schedule": "0 9 * * *",
+      "agents": [
+        "integration"
+      ],
+      "description": "Check for dependency updates"
+    },
+    "weekly_refactoring": {
+      "schedule": "0 10 ? * MON",
+      "agents": [
+        "evolution",
+        "core"
+      ],
+      "description": "Identify refactoring opportunities"
+    },
+    "monthly_health_check": {
+      "schedule": "0 10 1 * *",
+      "agents": [
+        "evolution",
+        "quality"
+      ],
+      "description": "Review technical debt and quality metrics"
+    }
+  },
+  "workflow_definitions": {
+    "pr_validation": {
+      "description": "Parallel workflow for PR validation",
+      "agents": [
+        "quality",
+        "integration",
+        "documentation",
+        "contract"
+      ],
+      "mode": "parallel",
+      "success_requires": "all_agents_pass",
+      "on_failure": "block_merge"
+    },
+    "feature_implementation": {
+      "description": "Sequential workflow for feature implementation",
+      "agents": [
+        "core",
+        "quality",
+        "documentation",
+        "integration"
+      ],
+      "mode": "sequential",
+      "success_requires": "all_agents_pass",
+      "on_failure": "return_to_failed_agent"
+    },
+    "release_workflow": {
+      "description": "Orchestrated release workflow",
+      "agents": [
+        "evolution",
+        "contract",
+        "quality",
+        "integration"
+      ],
+      "mode": "sequential",
+      "success_requires": "all_agents_pass",
+      "on_failure": "human_review"
+    }
+  },
+  "coordination_rules": {
+    "sequential_execution": [
+      [
+        "core",
+        "quality",
+        "documentation",
+        "integration"
+      ],
+      [
+        "contract",
+        "quality",
+        "documentation"
+      ],
+      [
+        "evolution",
+        "contract",
+        "integration"
+      ]
+    ],
+    "parallel_execution": [
+      [
+        "quality",
+        "integration",
+        "documentation"
+      ],
+      [
+        "quality",
+        "integration"
+      ]
+    ],
+    "handoff_protocol": {
+      "description": "When one agent completes, notify next agent in chain",
+      "enabled": true,
+      "handoff_directory": ".claude/handoffs/"
+    }
+  },
+  "safety_settings": {
+    "human_review_required": {
+      "breaking_api_changes": true,
+      "removal_of_deprecated_apis": true,
+      "major_dependency_upgrades": true,
+      "release_to_production": true,
+      "quality_threshold_reduction": true
+    },
+    "automatic_approval_for": {
+      "patch_dependency_updates": true,
+      "minor_dependency_updates": true,
+      "test_execution": true,
+      "documentation_updates": true,
+      "internal_refactoring": true
+    },
+    "circuit_breaker": {
+      "enabled": true,
+      "failure_threshold": 3,
+      "action_on_threshold": "disable_autonomy_require_approval"
+    },
+    "rollback_protocol": {
+      "enabled": true,
+      "auto_rollback_on_build_failure": true,
+      "auto_rollback_on_test_failure": false,
+      "notify_human_on_rollback": true
+    }
+  }
+}

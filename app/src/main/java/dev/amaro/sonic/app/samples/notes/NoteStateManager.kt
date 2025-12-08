@@ -3,6 +3,7 @@ package dev.amaro.sonic.app.samples.notes
 import androidx.navigation.NavController
 import dev.amaro.sonic.IAction
 import dev.amaro.sonic.IReducer
+import dev.amaro.sonic.ResultInfo
 import dev.amaro.sonic.StateManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,16 @@ class NoteStateManager(
             return when (action) {
                 is Action.Load -> {
                     NoteState(storage.list().sortedBy { it.title })
+                }
+                is Action.LoadSuccess -> {
+                    currentState.copy(
+                        notes = storage.list().sortedBy { it.title },
+                        result = action.result
+                    )
+                }
+
+                is Action.LoadFailed -> {
+                    currentState.copy(result = action.result)
                 }
                 is Action.ToggleClosedNotes -> {
                     val flag = !currentState.showOnlyOpen
@@ -71,4 +82,6 @@ sealed class Action : IAction {
     data class AddNote(val note: Note) : Action()
     data class DeleteNote(val note: Note) : Action()
     data class ToggleNote(val note: Note) : Action()
+    data class LoadSuccess(val result: ResultInfo.Success) : Action()
+    data class LoadFailed(val result: ResultInfo.Failure) : Action()
 }

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import dev.amaro.sonic.IPerformer
 import dev.amaro.sonic.IRenderer
 import dev.amaro.sonic.app.R
@@ -64,13 +65,25 @@ class FirstFragment : Fragment(), IRenderer<Converter.State> {
         spinnerTarget.setSelection(targetAdapter.getPosition(state.target))
 
         spinnerTarget.selection<String>()
-            .collectOn(Dispatchers.Main) { performer.perform(Converter.Action.SetTarget(it)) }
+            .collectOn(
+                viewLifecycleOwner.lifecycleScope,
+                Dispatchers.Main
+            ) { performer.perform(Converter.Action.SetTarget(it)) }
         spinnerSource.selection<String>()
-            .collectOn(Dispatchers.Main) { performer.perform(Converter.Action.SetSource(it)) }
+            .collectOn(
+                viewLifecycleOwner.lifecycleScope,
+                Dispatchers.Main
+            ) { performer.perform(Converter.Action.SetSource(it)) }
         fieldAmount.toFlow()
-            .collectOn(Dispatchers.Main) { performer.perform(Converter.Action.SetAmount(it.toString())) }
+            .collectOn(
+                viewLifecycleOwner.lifecycleScope,
+                Dispatchers.Main
+            ) { performer.perform(Converter.Action.SetAmount(it.toString())) }
         button.clicks()
-            .collectOn(Dispatchers.Main) { performer.perform(Converter.Action.SwitchCurrencies) }
+            .collectOn(
+                viewLifecycleOwner.lifecycleScope,
+                Dispatchers.Main
+            ) { performer.perform(Converter.Action.SwitchCurrencies) }
         textResult.text = state.result?.toString() ?: ""
     }
 }

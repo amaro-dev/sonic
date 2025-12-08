@@ -7,9 +7,7 @@ import dev.amaro.sonic.app.samples.notes.*
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -49,50 +47,56 @@ class NoteTest : KoinTest {
     }
 
     @Test
-    fun `Load saved notes on start`() {
+    fun `Load saved notes on start`() = kotlinx.coroutines.test.runTest {
         setNotesOnStorage(oneTodoAndOneClosed)
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        NoteScreen(renderer, get(), scope)
+        NoteScreen(renderer, get(), this)
+        advanceUntilIdle()
         renderer.verifyState(NoteState(oneTodoAndOneClosed))
     }
 
     @Test
-    fun `Toggle closed notes`() {
+    fun `Toggle closed notes`() = kotlinx.coroutines.test.runTest {
         setNotesOnStorage(oneTodoAndOneClosed)
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        val screen = NoteScreen(renderer, get(), scope)
+        val screen = NoteScreen(renderer, get(), this)
+        advanceUntilIdle()
         screen.perform(Action.ToggleClosedNotes)
+        advanceUntilIdle()
         renderer.verifyState(NoteState(oneTodo, true))
     }
 
     @Test
-    fun `Add new note`() {
+    fun `Add new note`() = kotlinx.coroutines.test.runTest {
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        val screen = NoteScreen(renderer, get(), scope)
+        val screen = NoteScreen(renderer, get(), this)
+        advanceUntilIdle()
         screen.perform(Action.AddNote(Note("Task 1", false)))
+        advanceUntilIdle()
         renderer.verifyState(NoteState(oneTodo, false))
     }
 
     @Test
-    fun `Add two new notes`() {
+    fun `Add two new notes`() = kotlinx.coroutines.test.runTest {
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        val screen = NoteScreen(renderer, get(), scope)
+        val screen = NoteScreen(renderer, get(), this)
+        advanceUntilIdle()
         screen.perform(Action.AddNote(Note("Task 1", false)))
+        advanceUntilIdle()
         screen.perform(Action.AddNote(Note("Task 2", true)))
+        advanceUntilIdle()
         renderer.verifyState(NoteState(oneTodoAndOneClosed, false))
     }
 
     @Test
-    fun `Toggle note`() {
+    fun `Toggle note`() = kotlinx.coroutines.test.runTest {
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-        val screen = NoteScreen(renderer, get(), scope)
+        val screen = NoteScreen(renderer, get(), this)
+        advanceUntilIdle()
         screen.perform(Action.AddNote(Note("Task 1", false)))
+        advanceUntilIdle()
         screen.perform(Action.ToggleNote(Note("Task 1", false)))
+        advanceUntilIdle()
         renderer.verifyState(NoteState(listOf(Note("Task 1", true)), false))
     }
 

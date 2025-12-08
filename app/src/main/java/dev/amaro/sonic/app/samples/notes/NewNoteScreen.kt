@@ -13,6 +13,7 @@ import dev.amaro.sonic.app.inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.onEach
 import org.koin.core.parameter.parametersOf
 
@@ -42,6 +43,7 @@ class CreateNoteScreen @JvmOverloads constructor(
     private val buttonCancel: Button
     private val textNoteDescription: TextInputLayout
     private val screen: NewNoteScreen by inject { parametersOf(this) }
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     init {
         LayoutInflater.from(context).inflate(R.layout.screen_new_note, this)
@@ -50,9 +52,9 @@ class CreateNoteScreen @JvmOverloads constructor(
         textNoteDescription = findViewById(R.id.fieldNote)
         buttonSave.clicks()
             .onEach { screen.perform(Action.AddNote(Note(textNoteDescription.text, false))) }
-            .collectOn(Dispatchers.Main) {}
+            .collectOn(scope, Dispatchers.Main) {}
         buttonCancel.clicks()
-            .collectOn(Dispatchers.Main) { screen.perform(Action.Cancel) }
+            .collectOn(scope, Dispatchers.Main) { screen.perform(Action.Cancel) }
     }
 
     override fun render(state: NoteState, performer: IPerformer<NoteState>) {
@@ -61,7 +63,7 @@ class CreateNoteScreen @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        // Lifecycle cleanup is handled by CoroutineScope
+        scope.cancel()
     }
 }
 

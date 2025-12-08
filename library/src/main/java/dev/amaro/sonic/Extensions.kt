@@ -2,18 +2,17 @@ package dev.amaro.sonic
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 
-inline fun <T> Flow<T>.collectOnDefault(crossinline action: suspend (value: T) -> Unit): Unit {
-    collectOn(Dispatchers.Default, action)
-}
+fun <T> Flow<T>.collectOnDefault(
+    scope: CoroutineScope,
+    action: suspend (T) -> Unit
+): Job = collectOn(scope, Dispatchers.Default, action)
 
 
-inline fun <T> Flow<T>.collectOn(
+fun <T> Flow<T>.collectOn(
+    scope: CoroutineScope,
     dispatcher: CoroutineDispatcher,
-    crossinline action: suspend (value: T) -> Unit
-) {
-    CoroutineScope(dispatcher).launch {
-        collect { action(it) }
-    }
+    action: suspend (T) -> Unit
+): Job = scope.launch(dispatcher) {
+    collect { action(it) }
 }

@@ -17,13 +17,10 @@ import dev.amaro.sonic.app.R
 import dev.amaro.sonic.app.clicks
 import dev.amaro.sonic.app.inject
 import dev.amaro.sonic.app.loadDrawable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
 import org.koin.core.parameter.parametersOf
 
 
@@ -44,7 +41,7 @@ class NoteScreen(
     }
 }
 
-class NoteListScreen @JvmOverloads constructor(
+class NoteListScreen constructor(
     context: Context
 ) : ConstraintLayout(context, null, -1), IRenderer<NoteState> {
 
@@ -52,6 +49,7 @@ class NoteListScreen @JvmOverloads constructor(
     private val listNotes: RecyclerView
     private val screen: NoteScreen by inject { parametersOf(this as IRenderer<NoteState>) }
     private val adapter: NoteAdapter
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     init {
         LayoutInflater.from(context).inflate(R.layout.screen_note_list, this)
@@ -59,12 +57,12 @@ class NoteListScreen @JvmOverloads constructor(
         listNotes = findViewById(R.id.listNotes)
         buttonNew.clicks()
             .onEach { screen.perform(Action.NewNote) }
-            .collectOn(Dispatchers.Main) {}
+            .collectOn(scope, Dispatchers.Main) {}
         listNotes.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         adapter = NoteAdapter(mutableListOf()).apply {
             onClick()
                 .onEach { screen.perform(it) }
-                .collectOn(Dispatchers.Main) {}
+                .collectOn(scope, Dispatchers.Main) {}
         }
         listNotes.adapter = adapter
     }
@@ -75,7 +73,7 @@ class NoteListScreen @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        // Lifecycle cleanup is handled by CoroutineScope
+        scope.cancel()
     }
 }
 

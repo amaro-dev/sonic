@@ -1,0 +1,31 @@
+plugins {
+    id 'kotlin'
+    id 'java-library'
+}
+
+ext.detektVersion = '1.23.4'
+
+dependencies {
+    // Detekt API - provided by Detekt itself at runtime
+    compileOnly "io.gitlab.arturbosch.detekt:detekt-api:${detektVersion}"
+
+    // Testing
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "io.gitlab.arturbosch.detekt:detekt-test:${detektVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:1.8.22"
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+// Ensure META-INF services are included in the JAR
+jar {
+    from sourceSets.main.resources
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}

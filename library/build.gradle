@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'kotlin'
+    id 'io.gitlab.arturbosch.detekt'
 }
 
 dependencies {
@@ -10,6 +11,14 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation("io.mockk:mockk:1.12.4")
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0'
+
+    // Custom Detekt rules
+    detektPlugins project(':detekt-rules')
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    config.setFrom(files("$rootDir/detekt.yml"))
 }
 
 

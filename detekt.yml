@@ -1,0 +1,13 @@
+style:
+  NewLineAtEndOfFile:
+    active: false
+  WildcardImport:
+    active: false
+
+complexity:
+  NestedBlockDepth:
+    active: false
+
+sonic-rules:
+  MutableMiddlewareRule:
+    active: true

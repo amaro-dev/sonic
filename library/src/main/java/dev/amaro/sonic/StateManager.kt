@@ -1,6 +1,7 @@
 package dev.amaro.sonic
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -29,6 +30,12 @@ abstract class StateManager<T>(
     override fun perform(action: IAction) {
         scope.launch {
             middlewares.forEach { it.process(action, state.value, this@StateManager) }
+        }
+    }
+
+    override suspend fun scopedPerform(block: suspend () -> IAction): Job {
+        return scope.launch {
+            perform(block())
         }
     }
 }

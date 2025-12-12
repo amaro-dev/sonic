@@ -65,6 +65,12 @@ class CreateNoteScreen @JvmOverloads constructor(
         super.onDetachedFromWindow()
         scope.cancel()
     }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        // Ensure state binding is ready before user interactions
+        screen
+    }
 }
 
 val TextInputLayout.text: String

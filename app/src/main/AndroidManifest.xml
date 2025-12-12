@@ -34,6 +34,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="dev.amaro.sonic.app.samples.notes.NoteComposeActivity"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
         <activity android:name=".samples.calculator.ComposeActivity" android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

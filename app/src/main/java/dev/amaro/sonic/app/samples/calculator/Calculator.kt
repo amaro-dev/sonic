@@ -28,7 +28,7 @@ object Calculator {
                 processor.reduce(action)
             }
             if (state.firstNumber != null && (state.secondNumber != null || action is Action.SecondNumber) && state.operation != null) {
-                val secondNumber = (state.secondNumber ?: (action as Action.SecondNumber).number)
+                val secondNumber: Float = (state.secondNumber ?: (action as Action.SecondNumber).number).toFloat()
                 val result = when (state.operation) {
                     Operation.Add -> state.firstNumber + secondNumber
                     Operation.Multiply -> state.firstNumber * secondNumber
@@ -52,12 +52,12 @@ object Calculator {
         override val reducer: IReducer<State> = object : IReducer<State> {
             override fun reduce(action: IAction, currentState: State): State {
                 return when (action) {
-                    is Action.FirstNumber -> currentState.copy(firstNumber = action.number)
-                    is Action.SecondNumber -> currentState.copy(secondNumber = action.number)
+                    is Action.FirstNumber -> currentState.copy(firstNumber = action.number.toFloat())
+                    is Action.SecondNumber -> currentState.copy(secondNumber = action.number.toFloat())
                     is Action.SetResult -> currentState.copy(result = action.number)
                     is Action.OperationCommand -> currentState.copy(operation = action.operation)
                     is Action.Restart -> State()
-                    else -> State()
+                    else -> currentState
                 }
             }
 
@@ -83,7 +83,7 @@ object Calculator {
         object Restart : Action()
         data class FirstNumber(val number: Int) : Action()
         data class SecondNumber(val number: Int) : Action()
-        data class SetResult(val number: Int) : Action()
+        data class SetResult(val number: Float) : Action()
         data class OperationChoice(val symbol: String) : Action()
         data class OperationCommand(val operation: Operation) : Action()
     }
@@ -96,10 +96,9 @@ object Calculator {
     }
 
     data class State(
-        val firstNumber: Int? = null,
-        val secondNumber: Int? = null,
+        val firstNumber: Float? = null,
+        val secondNumber: Float? = null,
         val operation: Operation? = null,
-        val result: Int? = null
+        val result: Float? = null
     )
 }
-

@@ -1,10 +1,6 @@
 package dev.amaro.sonic.app.samples.notes
 
-import androidx.navigation.NavController
-import dev.amaro.sonic.IAction
-import dev.amaro.sonic.IReducer
-import dev.amaro.sonic.ResultInfo
-import dev.amaro.sonic.StateManager
+import dev.amaro.sonic.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,15 +16,38 @@ class NoteStateManager(
     private val storage: IStorage by inject()
 
     init {
-        val navController: NavController by inject()
-        addMiddleware(Navigator(navController))
+        val navController = runCatching { getKoin().get<androidx.navigation.NavController>() }.getOrNull()
+        navController?.let { addMiddleware(Navigator(it)) }
+    }
+
+    private fun operationSucceeded(operation: String): ResultInfo.Success =
+        success("STORAGE")
+            .metadata("operation", operation)
+            .buildSuccess()
+
+    private fun storageFailure(message: String, cause: Throwable? = null): ResultInfo.Failure {
+        val builder = failure("STORAGE_ERROR", message)
+        builder.retryable(true)
+        builder.cause = cause
+        return builder.buildFailure()
     }
 
     override val reducer: IReducer<NoteState> = object : IReducer<NoteState> {
         override fun reduce(action: IAction, currentState: NoteState): NoteState {
             return when (action) {
                 is Action.Load -> {
-                    NoteState(storage.list().sortedBy { it.title })
+                    runCatching { storage.list().sortedBy { it.title } }
+                        .fold(
+                            onSuccess = {
+                                NoteState(
+                                    notes = it,
+                                    result = operationSucceeded("load")
+                                )
+                            },
+                            onFailure = {
+                                currentState.copy(result = storageFailure("Failed to load notes", it))
+                            }
+                        )
                 }
                 is Action.LoadSuccess -> {
                     currentState.copy(
@@ -44,29 +63,69 @@ class NoteStateManager(
                     val flag = !currentState.showOnlyOpen
                     currentState.copy(
                         notes = storage.list().filter { !flag || !it.done }.sortedBy { it.title },
-                        showOnlyOpen = flag
+                        showOnlyOpen = flag,
+                        result = operationSucceeded("toggle_filter")
                     )
                 }
                 is Action.ToggleNote -> {
-                    storage.update(action.note)
-                    currentState.copy(
-                        notes = storage.list().filter { !currentState.showOnlyOpen || !it.done }
-                            .sortedBy { it.title },
-                    )
+                    runCatching { storage.update(action.note) }
+                        .fold(
+                            onSuccess = {
+                                currentState.copy(
+                                    notes = storage.list()
+                                        .filter { !currentState.showOnlyOpen || !it.done }
+                                        .sortedBy { it.title },
+                                    result = operationSucceeded("toggle_note")
+                                )
+                            },
+                            onFailure = {
+                                currentState.copy(result = storageFailure("Failed to update note", it))
+                            }
+                        )
                 }
                 is Action.AddNote -> {
-                    storage.save(action.note)
-                    currentState.copy(
-                        notes = storage.list().filter { !currentState.showOnlyOpen || !it.done }
-                            .sortedBy { it.title },
-                    )
+                    if (action.note.title.isBlank()) {
+                        currentState.copy(
+                            result = failure("VALIDATION", "Note title cannot be empty")
+                                .retryable(false)
+                                .buildFailure()
+                        )
+                    } else {
+                        runCatching { storage.save(action.note) }
+                            .fold(
+                                onSuccess = {
+                                    currentState.copy(
+                                        notes = storage.list()
+                                            .filter { !currentState.showOnlyOpen || !it.done }
+                                            .sortedBy { it.title },
+                                        result = operationSucceeded("add_note")
+                                    )
+                                },
+                                onFailure = {
+                                    currentState.copy(result = storageFailure("Failed to add note", it))
+                                }
+                            )
+                    }
                 }
                 is Action.DeleteNote -> {
-                    storage.delete(action.note)
-                    currentState.copy(
-                        notes = storage.list().filter { !currentState.showOnlyOpen || !it.done }
-                            .sortedBy { it.title },
-                    )
+                    runCatching { storage.delete(action.note) }
+                        .fold(
+                            onSuccess = {
+                                currentState.copy(
+                                    notes = storage.list()
+                                        .filter { !currentState.showOnlyOpen || !it.done }
+                                        .sortedBy { it.title },
+                                    result = operationSucceeded("delete_note")
+                                )
+                            },
+                            onFailure = {
+                                currentState.copy(result = storageFailure("Failed to delete note", it))
+                            }
+                        )
+                }
+
+                is Action.ClearResult -> {
+                    currentState.copy(result = null)
                 }
                 else -> currentState
             }
@@ -84,4 +143,5 @@ sealed class Action : IAction {
     data class ToggleNote(val note: Note) : Action()
     data class LoadSuccess(val result: ResultInfo.Success) : Action()
     data class LoadFailed(val result: ResultInfo.Failure) : Action()
+    object ClearResult : Action()
 }

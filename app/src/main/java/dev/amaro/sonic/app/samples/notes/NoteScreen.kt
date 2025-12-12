@@ -75,6 +75,12 @@ class NoteListScreen constructor(
         super.onDetachedFromWindow()
         scope.cancel()
     }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        // Force screen creation so state binding happens before user actions
+        screen
+    }
 }
 
 class NoteAdapter(private val items: MutableList<Note>) :

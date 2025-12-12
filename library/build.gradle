@@ -6,6 +6,8 @@ plugins {
 
 dependencies {
     api project(':sonic-core')
+    api project(':sonic-binding')
+    api project(':sonic-result')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0'

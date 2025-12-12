@@ -5,6 +5,8 @@ plugins {
 }
 
 dependencies {
+    api project(':sonic-core')
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
@@ -24,4 +26,3 @@ detekt {
 
 //apply from: 'https://gist.githubusercontent.com/RodrigoAmaroEng/311aea4b8d263f1b7b4dc02f65de9151/raw/a77150e72ea0e9729293bcb8ad3ca20f56c449fc/publish.gradle'
 apply from: '../publish.gradle'
-

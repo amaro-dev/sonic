@@ -26,10 +26,17 @@ can quickly scan intent, prerequisites, workflow, and next steps.
 1. **Install the library**
    ```kotlin
    // From Maven Central (preferred)
-   implementation("dev.amaro.sonic:sonic-core:0.6.0")
+   implementation(platform("dev.amaro.sonic:sonic-bom:0.6.0"))
+   implementation("dev.amaro.sonic:sonic-core")
+   implementation("dev.amaro.sonic:sonic-binding")
+   implementation("dev.amaro.sonic:sonic-result")
+   implementation("dev.amaro.sonic:sonic-compose")
 
    // From a multi-module workspace
-   implementation(project(":library"))
+   implementation(project(":sonic-core"))
+   implementation(project(":sonic-binding"))
+   implementation(project(":sonic-result"))
+   implementation(project(":sonic-compose"))
    ```
 2. **Model your feature**
    ```kotlin

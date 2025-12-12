@@ -4,7 +4,7 @@
 
 Selectors allow Compose components (or any Flow consumer) to subscribe to derived slices of state so only the relevant
 UI recomposes. Sonic provides `selectDistinct` in `StateSelectors.kt` and a CompositionLocal helper (
-`StateManagerContext`, `LocalStateManager`) in the app module.
+`StateManagerContext`, `LocalStateManager`) in the `sonic-compose` module.
 
 ## Key Points
 
@@ -24,24 +24,21 @@ UI recomposes. Sonic provides `selectDistinct` in `StateSelectors.kt` and a Comp
 
 - A `StateManager` emitting updates (via `listen()`).
 - Familiarity with Compose (for CompositionLocal examples).
+- Dependency on `sonic-compose`.
 
 ## Workflow
 
 1. **Provide the manager once**
    ```kotlin
+   import dev.amaro.sonic.compose.LocalStateManager
+   import dev.amaro.sonic.compose.StateManagerContext
+
    @Composable
    fun NoteComposeActivityContent(manager: NoteStateManager) {
        CompositionLocalProvider(LocalStateManager provides StateManagerContext(manager)) {
            NoteComposeRoot(manager)
        }
    }
-   ```
-   > `StateManagerContext` and `LocalStateManager` are part of the sample app, not the core artifact. Copy the helper
-   below into your project (or adapt it) before using this pattern:
-   ```kotlin
-   data class StateManagerContext<T>(val manager: IStateManager<T>)
-
-   val LocalStateManager = compositionLocalOf<StateManagerContext<*>?> { null }
    ```
 
 2. **Subscribe to derived data**

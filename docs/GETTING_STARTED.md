@@ -8,7 +8,8 @@ have never touched the project before and want a reproducible checklist from clo
 
 ## Key Points
 
-- Use Gradle to depend on the `library` module or the published `dev.amaro.sonic:sonic-core` artifact.
+- Use Gradle to depend on the Sonic modules you need (`sonic-core`, `sonic-binding`, `sonic-result`, `sonic-compose`) or
+  the published artifacts (preferably via the BoM).
 - Every Sonic feature starts with a `StateManager`, a `Reducer`, and an `IRenderer`.
 - `bindState` wires state updates to UI code and respects the coroutine scope you provide.
 - The `app` module contains runnable samples (XML and Compose) that prove your toolchain is set up correctly.
@@ -25,9 +26,12 @@ have never touched the project before and want a reproducible checklist from clo
    ```kotlin
    // build.gradle.kts (module)
    dependencies {
-       implementation("dev.amaro.sonic:sonic-core:0.6.0")
-       // or, when working inside this repo
-       implementation(project(":library"))
+       implementation(platform("dev.amaro.sonic:sonic-bom:0.6.0"))
+       implementation("dev.amaro.sonic:sonic-core")
+       implementation("dev.amaro.sonic:sonic-binding")
+       implementation("dev.amaro.sonic:sonic-result")
+       implementation("dev.amaro.sonic:sonic-compose")
+       // or, when working inside this repo, depend on the matching modules directly
    }
    ```
    Sync the project to download the artifacts.

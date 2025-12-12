@@ -8,7 +8,7 @@ understand what each sample teaches and how to run it.
 ## Key Points
 
 - Samples live under `app/src/main/java/dev/amaro/sonic/app/samples`.
-- All samples reuse the same library classes; only the UI layer changes.
+- All samples reuse the same Sonic modules; only the UI layer changes.
 - Running them locally is the fastest way to verify your Sonic installation.
 
 ## Prerequisites
@@ -43,4 +43,4 @@ understand what each sample teaches and how to run it.
 
 - Use these samples as blueprints when bootstrapping new features.
 - Cross-reference with `docs/features/*.md` to understand which concepts each sample exercises.
-- When modifying the library, update samples alongside the docs to keep parity.
+- When modifying the modules, update samples alongside the docs to keep parity.

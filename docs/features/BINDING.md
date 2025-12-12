@@ -8,8 +8,8 @@ to use `StateBinding`.
 
 ## Key Points
 
-- `bindState` lives in `Binding.kt` and requires a manager, renderer, scope, and optional dispatcher.
-- `StateBinding` (from `StateBinding.kt`) wraps value + performer for Compose previews or DI wiring.
+- `bindState` lives in `Binding.kt` (sonic-binding) and requires a manager, renderer, scope, and optional dispatcher.
+- `StateBinding` (from the `sonic-binding` module) wraps value + performer for Compose previews or DI wiring.
 - You own the lifecycle: cancelling the provided scope (or the returned job) stops rendering.
 
 ## Prerequisites

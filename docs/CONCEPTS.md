@@ -8,7 +8,8 @@ same mental model before touching feature-specific guides.
 ## Key Points
 
 - Sonic follows a predictable loop: `Action → Middleware → Reducer → State → Agents → Renderer → Action`.
-- Interfaces live under `library/src/main/java/dev/amaro/sonic` and are platform-agnostic.
+- Interfaces live under the new modules (`sonic-core`, `sonic-binding`, `sonic-result`, `sonic-compose`) in
+  `*/src/main/java/dev/amaro/sonic` and remain platform-agnostic.
 - You can adopt subsets (e.g., state manager + renderer only) or the whole pipeline depending on your needs.
 
 ## Prerequisites

@@ -1,4 +1,4 @@
-package dev.amaro.sonic.app.compose
+package dev.amaro.sonic.compose
 
 import androidx.compose.runtime.compositionLocalOf
 import dev.amaro.sonic.IStateManager

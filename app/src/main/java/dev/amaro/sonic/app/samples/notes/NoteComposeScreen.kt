@@ -12,8 +12,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.amaro.sonic.*
-import dev.amaro.sonic.app.compose.LocalStateManager
-import dev.amaro.sonic.app.compose.StateManagerContext
+import dev.amaro.sonic.compose.LocalStateManager
+import dev.amaro.sonic.compose.StateManagerContext
 
 /**
  * Compose showcase for selectors + rich result handling.

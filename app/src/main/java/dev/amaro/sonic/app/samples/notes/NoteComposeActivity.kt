@@ -6,8 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.CompositionLocalProvider
-import dev.amaro.sonic.app.compose.LocalStateManager
-import dev.amaro.sonic.app.compose.StateManagerContext
+import dev.amaro.sonic.compose.LocalStateManager
+import dev.amaro.sonic.compose.StateManagerContext
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext

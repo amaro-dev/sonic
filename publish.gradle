@@ -1,6 +1,9 @@
 apply plugin: "maven-publish"
 apply plugin: 'signing'
 
+def hasJavaLibrary = project.plugins.hasPlugin('java') || project.plugins.hasPlugin('java-library')
+def hasAndroidLibrary = project.plugins.hasPlugin('com.android.library')
+
 ext.developer = new Properties()
 ext.developer.id = project.findProperty("dev.id")
 ext.developer.name = project.findProperty("dev.name")
@@ -13,9 +16,9 @@ ext.pack.version = project.findProperty("pom.version")
 ext.pack.description = project.findProperty("pom.description")
 ext.pack.name = project.findProperty("pom.name")
 
-def file = file("$projectDir/local.properties")
-if (file.exists()) {
-    file.withReader {
+def localPropsFile = file("$projectDir/local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.withReader {
         Properties props = new Properties()
         props.load(it)
         props.propertyNames().each {
@@ -40,14 +43,35 @@ ext.deploy.address = new Properties()
 ext.deploy.address.release = project.findProperty("publish.address.release") ?: System.getenv('PUBLISH_ADDRESS_RELEASE') ?: ""
 ext.deploy.address.snapshot = project.findProperty("publish.address.snapshot") ?: System.getenv('PUBLISH_ADDRESS_SNAPSHOT') ?: ""
 
+if (hasJavaLibrary) {
+    java {
+        withJavadocJar()
+        withSourcesJar()
+    }
 
-java {
-    withJavadocJar()
-    withSourcesJar()
-}
-
-artifacts {
-    archives javadocJar, sourcesJar
+    artifacts {
+        archives javadocJar, sourcesJar
+    }
+} else if (hasAndroidLibrary) {
+    afterEvaluate {
+        def androidSourcesJar = tasks.register("androidSourcesJar", Jar) {
+            archiveClassifier.set("sources")
+            if (project.hasProperty("android")) {
+                from android.sourceSets.main.java.srcDirs
+                def kotlinDir = file("src/main/kotlin")
+                if (kotlinDir.exists()) {
+                    from kotlinDir
+                }
+            }
+        }
+        def androidJavadocsJar = tasks.register("androidJavadocsJar", Jar) {
+            archiveClassifier.set("javadoc")
+        }
+        artifacts {
+            archives androidJavadocsJar
+            archives androidSourcesJar
+        }
+    }
 }
 
 
@@ -55,54 +79,68 @@ signing {
     sign publishing.publications
 }
 
-javadoc {
-    if (JavaVersion.current().isJava9Compatible()) {
-        options.addBooleanOption('html5', true)
+if (tasks.findByName("javadoc")) {
+    javadoc {
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
     }
 }
 
-publishing {
-    publications {
-        library(MavenPublication) {
-            from components.java
-            groupId pack.group
-            artifactId pack.artifact
-            version pack.version
-            pom {
-                description = pack.description
-                name = pack.name
-                url = pack.scm
-                licenses {
-                    license {
-                        name = "The Apache Software License, Version 2.0"
-                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-                        distribution = "repo"
-                    }
+def configurePublishing = {
+    publishing {
+        publications {
+            library(MavenPublication) {
+                if (hasAndroidLibrary) {
+                    from components.release
+                } else {
+                    from components.java
                 }
-                developers {
-                    developer {
-                        id = developer.id
-                        name = developer.name
-                        email =developer.email
-                    }
-                }
-                scm {
+                groupId pack.group
+                artifactId pack.artifact
+                version pack.version
+                pom {
+                    description = pack.description
+                    name = pack.name
                     url = pack.scm
+                    licenses {
+                        license {
+                            name = "The Apache Software License, Version 2.0"
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                            distribution = "repo"
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = developer.id
+                            name = developer.name
+                            email = developer.email
+                        }
+                    }
+                    scm {
+                        url = pack.scm
+                    }
+                }
+
+            }
+        }
+        repositories {
+            maven {
+                name = deploy.system
+                url = uri(pack.version.endsWith('SNAPSHOT') ? deploy.address.snapshot : deploy.address.release)
+                credentials {
+                    username = deploy.user
+                    password = deploy.pass
                 }
             }
+        }
+    }
+}
 
-        }
-    }
-    repositories {
-        maven {
-            name = deploy.system
-            url = uri(pack.version.endsWith('SNAPSHOT') ? deploy.address.snapshot : deploy.address.release)
-            credentials {
-                username = deploy.user
-                password = deploy.pass
-            }
-        }
-    }
+if (hasAndroidLibrary) {
+    afterEvaluate { configurePublishing() }
+} else {
+    configurePublishing()
 }
 
 

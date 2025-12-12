@@ -1,0 +1,16 @@
+plugins {
+    id 'java-platform'
+}
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+    constraints {
+        api project(':sonic-core')
+        api project(':sonic-binding')
+        api project(':sonic-result')
+        api project(':sonic-compose')
+    }
+}

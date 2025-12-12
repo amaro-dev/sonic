@@ -1,4 +1,9 @@
 include ':library'
 include ':app'
 include ':detekt-rules'
+include ':sonic-core'
+include ':sonic-binding'
+include ':sonic-result'
+include ':sonic-compose'
+include ':sonic-bom'
 rootProject.name = "Sonic"

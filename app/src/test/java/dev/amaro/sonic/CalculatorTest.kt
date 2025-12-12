@@ -31,7 +31,7 @@ class CalculatorTest {
         }
         advanceUntilIdle()
         verify {
-            renderer.render(Calculator.State(firstNumber = 1), any())
+            renderer.render(Calculator.State(firstNumber = 1f), any())
         }
     }
 
@@ -43,7 +43,7 @@ class CalculatorTest {
         }
         advanceUntilIdle()
         verify {
-            renderer.render(Calculator.State(secondNumber = 1), any())
+            renderer.render(Calculator.State(secondNumber = 1f), any())
         }
     }
 }

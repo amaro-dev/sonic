@@ -41,7 +41,9 @@ android {
 }
 
 dependencies {
-    implementation project(":library")
+    implementation project(":sonic-core")
+    implementation project(":sonic-binding")
+    implementation project(":sonic-result")
     implementation project(":sonic-compose")
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.13.1'

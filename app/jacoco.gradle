@@ -27,11 +27,27 @@ jacoco {
 
 task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
 
+    def moduleDir = file("${projectDir}/../${jacocoSetup.targetModule}")
+    def androidClassesDir = new File(moduleDir, "build/tmp/kotlin-classes/debug")
+    def javaClassesDir = new File(moduleDir, "build/classes/kotlin/main")
+    def classesDir = androidClassesDir.exists() ? androidClassesDir : javaClassesDir
+
     classDirectories.setFrom(fileTree(
-            dir: "${projectDir}/../${jacocoSetup.targetModule}/build/tmp/kotlin-classes/debug",
+            dir: classesDir,
             excludes: androidExclusion
     ))
-    sourceDirectories.setFrom(files("../${jacocoSetup.targetModule}/src/main/java"))
+
+    def srcDirs = []
+    def javaSrc = new File(moduleDir, "src/main/java")
+    if (javaSrc.exists()) {
+        srcDirs << javaSrc
+    }
+    def kotlinSrc = new File(moduleDir, "src/main/kotlin")
+    if (kotlinSrc.exists()) {
+        srcDirs << kotlinSrc
+    }
+    sourceDirectories.setFrom(files(srcDirs))
+
     executionData.setFrom(files('build/jacoco/testDebugUnitTest.exec'))
 
 }

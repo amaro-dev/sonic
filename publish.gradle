@@ -3,6 +3,7 @@ apply plugin: 'signing'
 
 def hasJavaLibrary = project.plugins.hasPlugin('java') || project.plugins.hasPlugin('java-library')
 def hasAndroidLibrary = project.plugins.hasPlugin('com.android.library')
+def hasJavaPlatform = project.plugins.hasPlugin('java-platform')
 
 ext.developer = new Properties()
 ext.developer.id = project.findProperty("dev.id")
@@ -93,6 +94,8 @@ def configurePublishing = {
             library(MavenPublication) {
                 if (hasAndroidLibrary) {
                     from components.release
+                } else if (hasJavaPlatform) {
+                    from components.javaPlatform
                 } else {
                     from components.java
                 }

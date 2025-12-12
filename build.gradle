@@ -9,7 +9,7 @@ buildscript {
     }
     ext.jacocoSetup = new Properties()
     ext.jacocoSetup['version'] = "0.8.10"
-    ext.jacocoSetup['targetModule'] = "library"
+    ext.jacocoSetup['targetModule'] = "sonic-core"
     ext.sonarSetup = new Properties()
     ext.sonarSetup['version'] = '2.8'
     ext.sonarSetup['projectName'] = 'Sonic'
@@ -47,4 +47,3 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-

@@ -76,8 +76,19 @@ if (hasJavaLibrary) {
 }
 
 
-signing {
-    sign publishing.publications
+def hasSigningCredentials = [
+        ext.signing.keyId,
+        ext.signing.password,
+        ext.signing.secretKeyRingFile
+].every { it != null && !it.toString().trim().isEmpty() }
+
+if (hasSigningCredentials) {
+    signing {
+        sign publishing.publications
+    }
+} else {
+    tasks.withType(Sign).configureEach { enabled = false }
+    logger.lifecycle("Signing disabled: missing signing credentials")
 }
 
 if (tasks.findByName("javadoc")) {
@@ -147,5 +158,8 @@ if (hasAndroidLibrary) {
 }
 
 
-task publishLocal
-publishLocal.dependsOn 'publish'
+tasks.register("publishLocal") {
+    group = "publishing"
+    description = "Publishes artifacts to the local Maven repository"
+    dependsOn("publishToMavenLocal")
+}

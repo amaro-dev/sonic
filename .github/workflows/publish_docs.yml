@@ -1,0 +1,29 @@
+name: Publish Docs
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual trigger of the workflow
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed to push to gh-pages branch
+      pages: write # Needed to deploy to GitHub Pages
+      id-token: write # Needed for authentication with GitHub Pages
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install MkDocs and Material theme
+        run: pip install mkdocs mkdocs-material
+
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force --remote-name origin # --remote-name origin ensures it pushes to the correct remote

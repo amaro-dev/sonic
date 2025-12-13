@@ -1,0 +1,50 @@
+site_name: Sonic
+site_url: https://amaro-dev.github.io/sonic/
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+nav:
+  - Home: index.md
+  - Getting Started:
+      - GETTING_STARTED.md
+      - SAMPLE_WALKTHROUGH.md
+  - Core Concepts:
+      - CONCEPTS.md
+      - SPEC_MODULARIZATION.md
+  - Features:
+      - Binding: features/BINDING.md
+      - Dispatchers: features/DISPATCHERS.md
+      - Middlewares: features/MIDDLEWARE_AGENTS.md
+      - Result Handling: features/RESULT_HANDLING.md
+      - Selectors: features/SELECTORS.md
+  - API Reference: API_REFERENCE.md
+# Extra CSS or JS can be added here if needed for further customization
+# extra_css:
+#   - stylesheets/extra.css
+# extra_javascript:
+#   - javascripts/extra.js

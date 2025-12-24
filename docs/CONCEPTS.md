@@ -50,13 +50,13 @@ same mental model before touching feature-specific guides.
 
 8. **State Agents (IStateAgent)**
     - Observe emitted state (post-reducer) and can schedule new actions via `stateManager.scopedPerform`.
-    - Always return the original state; used for cross-cutting behavior like `ResultClearingAgent`.
+   - Always return the original state; used for cross-cutting behavior like `StatusClearingAgent`.
 
 9. **Selectors**
     - `selectDistinct` extension on `StateFlow`/`Flow` to subscribe to derived values (commonly used in Compose).
 
 10. **Result Suite**
-    - `Status`, `ResultClearingAgent`, and `IStatusContainer` provide a consistent pattern for
+    - `Status`, `StatusClearingAgent`, and `IStatusContainer` provide a consistent pattern for
       running/success/error handling.
 
 ## Data Flow

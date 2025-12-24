@@ -27,7 +27,7 @@ fun <T> Flow<T>.collectOn(
  * Example:
  * ```kotlin
  * stateManager.listen()
- *     .withAgent(ResultClearingAgent(stateManager, config))
+ *     .withAgent(StatusClearingAgent(stateManager, config))
  *     .collectAsState()
  * ```
  *
@@ -53,7 +53,7 @@ fun <T> Flow<T>.withAgent(agent: IStateAgent<T>): Flow<T> =
  * ```kotlin
  * stateManager.listen()
  *     .withAgents(
- *         ResultClearingAgent(stateManager, config),
+ *         StatusClearingAgent(stateManager, config),
  *         LoggingAgent(),
  *         AnalyticsAgent()
  *     )

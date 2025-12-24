@@ -40,20 +40,17 @@ import kotlinx.coroutines.delay
  *     val data: String = ""
  * )
  *
- * sealed class MyAction : IAction {
- *     object ClearResult : MyAction()
- * }
+ * // ClearStatus is provided as a canonical action in sonic-result.
  *
  * stateManager.listen()
- *     .withAgent(ResultClearingAgent(
+ *     .withAgent(StatusClearingAgent(
  *         stateManager = stateManager,
  *         config = ResultClearingConfig(
  *             successClearDelayMs = 3000,
  *             errorClearDelayMs = 5000,
  *             clearOnlyRetryableErrors = false
  *         ),
- *         extractResult = { it.status },
- *         createClearAction = { MyAction.ClearResult }
+ *         extractResult = { it.status }
  *     ))
  *     .collectAsState()
  * ```
@@ -67,13 +64,11 @@ import kotlinx.coroutines.delay
  * @param stateManager The StateManager that provides state and schedules actions
  * @param config Configuration for clearing delays and behavior
  * @param extractResult Function to extract Status from state (may return null)
- * @param createClearAction Function to create the clear action when result should be cleared
  */
-class ResultClearingAgent<T>(
+class StatusClearingAgent<T>(
     private val stateManager: IStateManager<T>,
     private val config: ResultClearingConfig,
-    private val extractResult: (T) -> Status?,
-    private val createClearAction: () -> IAction
+    private val extractResult: (T) -> Status?
 ) : IStateAgent<T> {
 
     /**
@@ -128,7 +123,7 @@ class ResultClearingAgent<T>(
                     // VERIFICATION: Check result hasn't changed during delay
                     if (extractResult(stateManager.listen().value) == result) {
                         // Result unchanged, safe to clear
-                        createClearAction()
+                        ClearStatus
                     } else {
                         // Result changed during delay, don't clear
                         NOOP

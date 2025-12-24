@@ -76,7 +76,7 @@ can quickly scan intent, prerequisites, workflow, and next steps.
 4. **Layer in advanced helpers**
     - Adopt Status for running/success/failure tracking (`docs/features/RESULT_HANDLING.md`).
     - Use `selectDistinct` with `LocalStateManager` for Compose selectors (`docs/features/SELECTORS.md`).
-    - Attach `ResultClearingAgent`, logging agents, or custom middleware as needed (
+   - Attach `StatusClearingAgent`, logging agents, or custom middleware as needed (
       `docs/features/MIDDLEWARE_AGENTS.md`).
 
 ## Data Flow

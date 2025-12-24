@@ -27,7 +27,7 @@ package dev.amaro.sonic
  *
  * EXAMPLE - Result Clearing Agent:
  * ```kotlin
- * class ResultClearingAgent<T>(
+ * class StatusClearingAgent<T>(
  *     private val stateManager: IStateManager<T>,
  *     private val config: ResultClearingConfig,
  *     private val extractResult: (T) -> Status?,
@@ -109,7 +109,7 @@ interface IStateAgent<T> {
      *
      * ```kotlin
      * if (state.hasNewResult) {  // True initially
-     *     stateManager.reduce(Action.ClearResult)
+     *     stateManager.reduce(ClearStatus)
      *     // After reduce: state.result = null
      *     // Next process() call: hasNewResult = false, no dispatch
      * }

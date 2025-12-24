@@ -1,9 +1,6 @@
 package dev.amaro.sonic.app.samples.notes
 
-import dev.amaro.sonic.IAction
-import dev.amaro.sonic.IReducer
-import dev.amaro.sonic.StateManager
-import dev.amaro.sonic.Status
+import dev.amaro.sonic.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -130,7 +127,7 @@ class NoteStateManager(
                         )
                 }
 
-                is Action.ClearResult -> {
+                is ClearStatus -> {
                     currentState.copy(status = null)
                 }
                 else -> currentState
@@ -149,5 +146,4 @@ sealed class Action : IAction {
     data class ToggleNote(val note: Note) : Action()
     data class LoadSuccess(val result: Status.Success) : Action()
     data class LoadFailed(val result: Status.Failure) : Action()
-    object ClearResult : Action()
 }

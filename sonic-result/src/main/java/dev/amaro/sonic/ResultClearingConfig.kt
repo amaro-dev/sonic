@@ -1,7 +1,7 @@
 package dev.amaro.sonic
 
 /**
- * Configuration for result clearing behavior in the Result Clearing Agent.
+ * Configuration for result clearing behavior in the Status Clearing Agent.
  *
  * Defines timing and conditions for automatic removal of [Status] from state
  * after successful or failed operations complete. Use this config to control how
@@ -18,8 +18,8 @@ package dev.amaro.sonic
  *     clearOnlyRetryableErrors = true  // Only auto-clear retryable errors
  * )
  *
- * // Pass to Result Clearing Agent during initialization
- * val resultClearer = ResultClearingAgent(stateManager, config)
+ * // Pass to StatusClearingAgent during initialization
+ * val resultClearer = StatusClearingAgent(stateManager, config)
  * ```
  *
  * @param successClearDelayMs Duration in milliseconds to wait before clearing successful results.

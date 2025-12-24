@@ -2,14 +2,14 @@
 
 ## Overview
 
-Sonic’s result suite (`Status`, `ResultClearingAgent`, `IStatusContainer`) standardizes how
+Sonic’s result suite (`Status`, `StatusClearingAgent`, `IStatusContainer`) standardizes how
 features expose successes and failures to the UI without ad-hoc enums or brittle timers.
 
 ## Key Points
 
 - `Status.Success` and `.Failure` capture metadata such as source, timestamp, retry-ability, and exceptions.
 - `Status.Running` represents in-flight work when you want a single status channel for loading + outcomes.
-- `ResultClearingAgent` clears transient statuses after configurable delays.
+- `StatusClearingAgent` clears transient statuses after configurable delays.
 - Implement `IStatusContainer` on your state when you want type-safe extraction of `status`.
 
 ## Prerequisites
@@ -38,7 +38,7 @@ features expose successes and failures to the UI without ad-hoc enums or brittle
                        retryable = true
                    )
                )
-               is Action.ClearResult -> current.copy(status = null)
+               is ClearStatus -> current.copy(status = null)
                else -> current
            }
        }
@@ -58,20 +58,19 @@ features expose successes and failures to the UI without ad-hoc enums or brittle
    }
    ```
 
-3. **Auto-clear with ResultClearingAgent**
+3. **Auto-clear with StatusClearingAgent**
    ```kotlin
    LaunchedEffect(manager) {
        manager.listen()
            .withAgent(
-               ResultClearingAgent(
+               StatusClearingAgent(
                    stateManager = manager,
                    config = ResultClearingConfig(
                        successClearDelayMs = 2000,
                        errorClearDelayMs = 5000,
                        clearOnlyRetryableErrors = false
                    ),
-                   extractResult = { it.status },
-                   createClearAction = { Action.ClearResult }
+                   extractResult = { it.status }
                )
            )
            .collect { /* no-op */ }
@@ -90,7 +89,7 @@ features expose successes and failures to the UI without ad-hoc enums or brittle
 ## Tips
 
 - Prefer `Status` constructors and `copy` for concise reducer code.
-- Keep `Action.ClearResult` (or equivalent) simple so agents can dispatch it safely.
+- Keep `ClearStatus` simple so agents can dispatch it safely.
 - Combine with selectors so only the banner recomposes when results change.
 
 ## Next Steps

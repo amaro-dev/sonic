@@ -78,14 +78,14 @@ add cross-cutting behaviors such as logging or result clearing.
    ```kotlin
    manager.listen()
        .withAgents(
-           ResultClearingAgent(...),
+           StatusClearingAgent(...),
            AnalyticsAgent(analytics)
        )
        .collect { state -> renderer.render(state, performer) }
    ```
 
 4. **Dispatching from agents**
-    - Use `stateManager.scopedPerform { action }` inside an agent for async operations (see `ResultClearingAgent` for
+    - Use `stateManager.scopedPerform { action }` inside an agent for async operations (see `StatusClearingAgent` for
       the canonical pattern with cancellation + verification).
 
 ## Tips

@@ -3,6 +3,7 @@ package dev.amaro.sonic.app.samples.notes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -40,11 +41,10 @@ fun NoteComposeRoot(manager: NoteStateManager) {
     LaunchedEffect(manager) {
         manager.listen()
             .withAgent(
-                ResultClearingAgent(
+                StatusClearingAgent(
                     manager,
                     ResultClearingConfig(),
-                    { it.status },
-                    { Action.ClearResult }
+                    { it.status }
                 )
             )
             .collect { }

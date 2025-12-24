@@ -48,7 +48,7 @@ interface IStateManager<T> {
      *             // Launch new job and track it for potential cancellation
      *             clearJob = stateManager.scopedPerform {
      *                 delay(3000)  // Wait before clearing
-     *                 Action.ClearResult
+     *                 ClearStatus
      *             }
      *         }
      *     }

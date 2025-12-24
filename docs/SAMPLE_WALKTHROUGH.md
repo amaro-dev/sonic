@@ -33,7 +33,7 @@ understand what each sample teaches and how to run it.
     - Run: `./gradlew :app:installDebug` → open “Converter” launcher icon (defined in `AndroidManifest.xml`).
 
 3. **Notes (`samples/notes/`)**
-    - Demonstrates: storage-backed CRUD, navigation middleware (`Navigator.kt`), `Status` + `ResultClearingAgent`,
+    - Demonstrates: storage-backed CRUD, navigation middleware (`Navigator.kt`), `Status` + `StatusClearingAgent`,
       and Jetpack Compose selectors.
     - XML flow: launch `NoteActivity` (View-based screens).
     - Compose showcase: launch `NoteComposeActivity` to see `NoteComposeRoot`, CompositionLocals, selectors, and

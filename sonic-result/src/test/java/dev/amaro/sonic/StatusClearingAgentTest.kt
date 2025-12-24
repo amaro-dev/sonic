@@ -7,27 +7,23 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 /**
- * Test suite for ResultClearingAgent.
+ * Test suite for StatusClearingAgent.
  *
  * Tests verify core functionality:
  * - Agent processes state without modification
  * - Agent respects configuration
  */
-class ResultClearingAgentTest {
+class StatusClearingAgentTest {
 
     data class TestState(
         val status: Status? = null,
         val data: String = ""
     )
 
-    sealed class TestAction : IAction {
-        object ClearResult : TestAction()
-    }
-
     private fun createTestReducer(): IReducer<TestState> = object : IReducer<TestState> {
         override fun reduce(action: IAction, currentState: TestState): TestState {
             return when (action) {
-                is TestAction.ClearResult -> currentState.copy(status = null)
+                is ClearStatus -> currentState.copy(status = null)
                 else -> currentState
             }
         }
@@ -45,11 +41,10 @@ class ResultClearingAgentTest {
 
     @Test
     fun `Agent processes null result without error`() = runTest {
-        val agent = ResultClearingAgent(
+        val agent = StatusClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(),
-            { it.status },
-            { TestAction.ClearResult }
+            { it.status }
         )
 
         agent.process(TestState())
@@ -58,11 +53,10 @@ class ResultClearingAgentTest {
 
     @Test
     fun `Agent returns state unmodified`() = runTest {
-        val agent = ResultClearingAgent(
+        val agent = StatusClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(),
-            { it.status },
-            { TestAction.ClearResult }
+            { it.status }
         )
 
         val state = TestState(
@@ -78,11 +72,10 @@ class ResultClearingAgentTest {
 
     @Test
     fun `Agent respects success clear delay configuration`() = runTest {
-        val agent = ResultClearingAgent(
+        val agent = StatusClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(successClearDelayMs = 2000),
-            { it.status },
-            { TestAction.ClearResult }
+            { it.status }
         )
 
         val state = TestState(status = Status.Success(source = "API"))
@@ -92,11 +85,10 @@ class ResultClearingAgentTest {
 
     @Test
     fun `Agent respects error clear delay configuration`() = runTest {
-        val agent = ResultClearingAgent(
+        val agent = StatusClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(errorClearDelayMs = 5000),
-            { it.status },
-            { TestAction.ClearResult }
+            { it.status }
         )
 
         val state = TestState(status = Status.Failure(code = "E", message = "Error"))
@@ -106,11 +98,10 @@ class ResultClearingAgentTest {
 
     @Test
     fun `Agent respects clearOnlyRetryableErrors configuration`() = runTest {
-        val agent = ResultClearingAgent(
+        val agent = StatusClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(clearOnlyRetryableErrors = true),
-            { it.status },
-            { TestAction.ClearResult }
+            { it.status }
         )
 
         val state = TestState(
@@ -126,11 +117,10 @@ class ResultClearingAgentTest {
 
     @Test
     fun `Agent processes multiple state updates`() = runTest {
-        val agent = ResultClearingAgent(
+        val agent = StatusClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(),
-            { it.status },
-            { TestAction.ClearResult }
+            { it.status }
         )
 
         val state1 = TestState(status = Status.Success(source = "API"))
@@ -150,11 +140,10 @@ class ResultClearingAgentTest {
 
     @Test
     fun `Agent ignores running status`() = runTest {
-        val agent = ResultClearingAgent(
+        val agent = StatusClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(),
-            { it.status },
-            { TestAction.ClearResult }
+            { it.status }
         )
 
         val state = TestState(status = Status.Running(source = "API"))
@@ -162,5 +151,21 @@ class ResultClearingAgentTest {
         advanceUntilIdle()
 
         assertEquals(state, result)
+    }
+
+    @Test
+    fun `Agent clears status with ClearStatus action`() = runTest {
+        val initialState = TestState(status = Status.Success(source = "API"))
+        val stateManager = createTestStateManager(createTestReducer(), this, initialState)
+        val agent = StatusClearingAgent(
+            stateManager,
+            ResultClearingConfig(successClearDelayMs = 0),
+            { it.status }
+        )
+
+        agent.process(stateManager.listen().value)
+        advanceUntilIdle()
+
+        assertEquals(null, stateManager.listen().value.status)
     }
 }

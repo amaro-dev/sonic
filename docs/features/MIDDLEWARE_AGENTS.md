@@ -41,7 +41,11 @@ add cross-cutting behaviors such as logging or result clearing.
    class ValidationMiddleware : IMiddleware<NoteState> {
        override suspend fun process(action: IAction, state: NoteState, processor: IProcessor<NoteState>) {
            if (action is Action.AddNote && action.note.title.isBlank()) {
-               processor.reduce(Action.LoadFailed(failure("VALIDATION", "Title can't be empty").buildFailure()))
+               processor.reduce(
+                   Action.LoadFailed(
+                       Status.Failure(code = "VALIDATION", message = "Title can't be empty")
+                   )
+               )
            } else {
                processor.perform(action)
            }

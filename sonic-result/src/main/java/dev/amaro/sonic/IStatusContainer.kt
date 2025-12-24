@@ -1,10 +1,10 @@
 package dev.amaro.sonic
 
 /**
- * Optional interface for type-safe extraction of result information from state.
+ * Optional interface for type-safe extraction of status information from state.
  *
  * This is an optional mixin interface that state classes can implement to provide
- * a standardized way to extract [ResultInfo] from state structures. This is NOT
+ * a standardized way to extract [Status] from state structures. This is NOT
  * required - state classes can manage results in any way they prefer.
  *
  * Useful when building state agents (like Result Clearing Agent) that need to
@@ -14,10 +14,10 @@ package dev.amaro.sonic
  * Implementation example:
  * ```
  * data class MyState(
- *     override val resultInfo: ResultInfo? = null,
+ *     override val status: Status? = null,
  *     val data: String = ""
  * ) : IStatusContainer {
- *     // resultInfo property inherited from interface
+ *     // status property inherited from interface
  * }
  * ```
  *
@@ -25,10 +25,10 @@ package dev.amaro.sonic
  * ```
  * override suspend fun process(state: AppState): AppState {
  *     // Only works if state implements IStatusContainer
- *     val resultInfo = (state as? IStatusContainer)?.resultInfo
+ *     val status = (state as? IStatusContainer)?.status
  *
- *     if (resultInfo != null) {
- *         // Handle the result
+ *     if (status != null) {
+ *         // Handle the status
  *         // Schedule clearing, notify UI, etc.
  *     }
  *     return state
@@ -36,14 +36,14 @@ package dev.amaro.sonic
  * ```
  *
  * Note: This interface is completely optional. State classes that don't need
- * result tracking or use alternative result storage patterns need not implement it.
+ * status tracking or use alternative status storage patterns need not implement it.
  */
 interface IStatusContainer {
     /**
-     * The result information from the current state.
+     * The status information from the current state.
      *
-     * @return The [ResultInfo] from state, or null if no result is present.
-     *         Implementing classes should return the current/latest result.
+     * @return The [Status] from state, or null if no status is present.
+     *         Implementing classes should return the current/latest status.
      */
-    val resultInfo: ResultInfo?
+    val status: Status?
 }

@@ -28,10 +28,9 @@ section that explains them in depth.
 | `Binding.kt`                                            | `bindState` helper for lifecycle-safe rendering.         | features/binding.md              |
 | `StateBinding.kt`                                       | Value/performer wrapper for Compose previews or DI.      | features/binding.md              |
 | `IProcessor.kt`, `Processor.kt`                         | Internal bridge between middleware and reducer.          | Concepts §3                      |
-| `ResultInfo.kt`                                         | Unified success/failure model.                           | features/result_handling.md      |
-| `ResultBuilder.kt`                                      | Fluent DSL for building `ResultInfo`.                    | features/result_handling.md      |
+| `Status.kt`                                             | Running/success/failure model.                           | features/result_handling.md      |
 | `ResultClearingAgent.kt`, `ResultClearingConfig.kt`     | Auto-clearing agent and config.                          | features/result_handling.md      |
-| `IStatusContainer.kt`                                   | Optional mixin exposing `resultInfo`.                    | features/result_handling.md      |
+| `IStatusContainer.kt`                                   | Optional mixin exposing `status`.                        | features/result_handling.md      |
 | `IStateAgent.kt`                                        | State reaction contract.                                 | features/middleware_agents.md    |
 | `Extensions.kt`                                         | Flow helpers (`collectOn`, `withAgent`, etc.).           | features/middleware_agents.md    |
 | `StateSelectors.kt`                                     | `selectDistinct` extensions for Flow/StateFlow.          | features/selectors.md            |

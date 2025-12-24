@@ -16,7 +16,7 @@ import dev.amaro.sonic.compose.LocalStateManager
 import dev.amaro.sonic.compose.StateManagerContext
 
 /**
- * Compose showcase for selectors + rich result handling.
+ * Compose showcase for selectors + rich status handling.
  *
  * Usage:
  * ```kotlin
@@ -43,7 +43,7 @@ fun NoteComposeRoot(manager: NoteStateManager) {
                 ResultClearingAgent(
                     manager,
                     ResultClearingConfig(),
-                    { it.result },
+                    { it.status },
                     { Action.ClearResult }
                 )
             )
@@ -215,11 +215,11 @@ private fun NoteItemRow(note: Note) {
 }
 
 /**
- * Action panel: Shows result status and action buttons.
- * Only recomposes when the result status changes.
+ * Action panel: Shows status and action buttons.
+ * Only recomposes when the status changes.
  *
  * Demonstrates: selectDistinct() with optional state.
- * The full state updates often, but this component only cares about result changes.
+ * The full state updates often, but this component only cares about status changes.
  */
 @Composable
 private fun NoteActionPanel(
@@ -230,7 +230,7 @@ private fun NoteActionPanel(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Show result status (success/error) if present
+        // Show status (running/success/error) if present
         ResultStatusPanel()
 
         // Action buttons
@@ -256,22 +256,29 @@ private fun NoteActionPanel(
 }
 
 /**
- * Result status panel: Shows success or error messages.
- * Only recomposes when the result changes.
+ * Status panel: Shows running, success, or error messages.
+ * Only recomposes when the status changes.
  */
 @Composable
 private fun ResultStatusPanel() {
     val context = LocalStateManager.current as? StateManagerContext<NoteState> ?: return
 
-    // Select only the result field
+    // Select only the status field
     // Doesn't recompose when notes, filters, or other fields change
     val result = context.manager.listen()
-        .selectDistinct { it.result }
+        .selectDistinct { it.status }
         .collectAsState(null)
 
     val status = result.value ?: return
     when (status) {
-        is ResultInfo.Success -> {
+        is Status.Running -> {
+            Text(
+                text = "… ${status.source}",
+                fontSize = 12.sp
+            )
+        }
+
+        is Status.Success -> {
             val operation = status.metadata["operation"] ?: "success"
             Text(
                 text = "✓ ${operation.toString().replace('_', ' ')} via ${status.source}",
@@ -279,7 +286,7 @@ private fun ResultStatusPanel() {
             )
         }
 
-        is ResultInfo.Failure -> {
+        is Status.Failure -> {
             Text(
                 text = "✗ ${status.code}: ${status.message}",
                 fontSize = 12.sp

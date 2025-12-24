@@ -16,7 +16,7 @@ import org.junit.Test
 class ResultClearingAgentTest {
 
     data class TestState(
-        val result: ResultInfo? = null,
+        val status: Status? = null,
         val data: String = ""
     )
 
@@ -27,7 +27,7 @@ class ResultClearingAgentTest {
     private fun createTestReducer(): IReducer<TestState> = object : IReducer<TestState> {
         override fun reduce(action: IAction, currentState: TestState): TestState {
             return when (action) {
-                is TestAction.ClearResult -> currentState.copy(result = null)
+                is TestAction.ClearResult -> currentState.copy(status = null)
                 else -> currentState
             }
         }
@@ -48,7 +48,7 @@ class ResultClearingAgentTest {
         val agent = ResultClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(),
-            { it.result },
+            { it.status },
             { TestAction.ClearResult }
         )
 
@@ -61,12 +61,12 @@ class ResultClearingAgentTest {
         val agent = ResultClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(),
-            { it.result },
+            { it.status },
             { TestAction.ClearResult }
         )
 
         val state = TestState(
-            result = ResultInfo.Success(source = "API"),
+            status = Status.Success(source = "API"),
             data = "test"
         )
 
@@ -81,11 +81,11 @@ class ResultClearingAgentTest {
         val agent = ResultClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(successClearDelayMs = 2000),
-            { it.result },
+            { it.status },
             { TestAction.ClearResult }
         )
 
-        val state = TestState(result = ResultInfo.Success(source = "API"))
+        val state = TestState(status = Status.Success(source = "API"))
         agent.process(state)
         advanceUntilIdle()
     }
@@ -95,11 +95,11 @@ class ResultClearingAgentTest {
         val agent = ResultClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(errorClearDelayMs = 5000),
-            { it.result },
+            { it.status },
             { TestAction.ClearResult }
         )
 
-        val state = TestState(result = ResultInfo.Failure(code = "E", message = "Error"))
+        val state = TestState(status = Status.Failure(code = "E", message = "Error"))
         agent.process(state)
         advanceUntilIdle()
     }
@@ -109,12 +109,12 @@ class ResultClearingAgentTest {
         val agent = ResultClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(clearOnlyRetryableErrors = true),
-            { it.result },
+            { it.status },
             { TestAction.ClearResult }
         )
 
         val state = TestState(
-            result = ResultInfo.Failure(
+            status = Status.Failure(
                 code = "E",
                 message = "Error",
                 retryable = false
@@ -129,13 +129,13 @@ class ResultClearingAgentTest {
         val agent = ResultClearingAgent(
             createTestStateManager(createTestReducer(), this),
             ResultClearingConfig(),
-            { it.result },
+            { it.status },
             { TestAction.ClearResult }
         )
 
-        val state1 = TestState(result = ResultInfo.Success(source = "API"))
-        val state2 = TestState(result = ResultInfo.Failure(code = "E", message = "Error"))
-        val state3 = TestState(result = null)
+        val state1 = TestState(status = Status.Success(source = "API"))
+        val state2 = TestState(status = Status.Failure(code = "E", message = "Error"))
+        val state3 = TestState(status = null)
 
         val result1 = agent.process(state1)
         val result2 = agent.process(state2)
@@ -146,5 +146,21 @@ class ResultClearingAgentTest {
         assertEquals(state1, result1)
         assertEquals(state2, result2)
         assertEquals(state3, result3)
+    }
+
+    @Test
+    fun `Agent ignores running status`() = runTest {
+        val agent = ResultClearingAgent(
+            createTestStateManager(createTestReducer(), this),
+            ResultClearingConfig(),
+            { it.status },
+            { TestAction.ClearResult }
+        )
+
+        val state = TestState(status = Status.Running(source = "API"))
+        val result = agent.process(state)
+        advanceUntilIdle()
+
+        assertEquals(state, result)
     }
 }

@@ -56,8 +56,8 @@ same mental model before touching feature-specific guides.
     - `selectDistinct` extension on `StateFlow`/`Flow` to subscribe to derived values (commonly used in Compose).
 
 10. **Result Suite**
-    - `ResultInfo`, `ResultBuilder`, `ResultClearingAgent`, and `IStatusContainer` provide a consistent pattern for
-      success/error handling.
+    - `Status`, `ResultClearingAgent`, and `IStatusContainer` provide a consistent pattern for
+      running/success/error handling.
 
 ## Data Flow
 

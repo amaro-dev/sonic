@@ -3,15 +3,26 @@ package dev.amaro.sonic
 import junit.framework.TestCase.*
 import org.junit.Test
 
-class ResultInfoTest {
+class StatusTest {
+
+    @Test
+    fun `Running variant has correct defaults`() {
+        // Arrange & Act
+        val running = Status.Running()
+
+        // Assert
+        assertEquals("", running.source)
+        assertTrue(running.timestamp > 0)
+        assertTrue(running.metadata.isEmpty())
+    }
 
     @Test
     fun `Success variant has correct defaults`() {
         // Arrange & Act
-        val success = ResultInfo.Success()
+        val success = Status.Success()
 
         // Assert
-        assertEquals("API", success.source)
+        assertEquals("", success.source)
         assertTrue(success.timestamp > 0)
         assertTrue(success.metadata.isEmpty())
     }
@@ -23,7 +34,7 @@ class ResultInfoTest {
         val metadata = mapOf("key" to "value", "count" to 42)
 
         // Act
-        val success = ResultInfo.Success(
+        val success = Status.Success(
             source = "CACHE",
             timestamp = timestamp,
             metadata = metadata
@@ -40,7 +51,7 @@ class ResultInfoTest {
     @Test
     fun `Failure variant has correct defaults`() {
         // Arrange & Act
-        val failure = ResultInfo.Failure(
+        val failure = Status.Failure(
             code = "ERROR",
             message = "Something went wrong"
         )
@@ -48,7 +59,9 @@ class ResultInfoTest {
         // Assert
         assertEquals("ERROR", failure.code)
         assertEquals("Something went wrong", failure.message)
+        assertEquals("", failure.source)
         assertTrue(failure.timestamp > 0)
+        assertTrue(failure.metadata.isEmpty())
         assertFalse(failure.retryable)
         assertNull(failure.cause)
     }
@@ -58,12 +71,15 @@ class ResultInfoTest {
         // Arrange
         val timestamp = 987654321L
         val exception = RuntimeException("Test exception")
+        val metadata = mapOf("trace" to "abc123")
 
         // Act
-        val failure = ResultInfo.Failure(
+        val failure = Status.Failure(
             code = "NETWORK_ERROR",
             message = "Connection timeout",
+            source = "API",
             timestamp = timestamp,
+            metadata = metadata,
             retryable = true,
             cause = exception
         )
@@ -71,7 +87,9 @@ class ResultInfoTest {
         // Assert
         assertEquals("NETWORK_ERROR", failure.code)
         assertEquals("Connection timeout", failure.message)
+        assertEquals("API", failure.source)
         assertEquals(timestamp, failure.timestamp)
+        assertEquals(metadata, failure.metadata)
         assertTrue(failure.retryable)
         assertEquals(exception, failure.cause)
     }
@@ -82,7 +100,7 @@ class ResultInfoTest {
         val exception = IllegalArgumentException("Invalid input")
 
         // Act
-        val failure = ResultInfo.Failure(
+        val failure = Status.Failure(
             code = "VALIDATION_ERROR",
             message = "Invalid data",
             cause = exception
@@ -94,12 +112,26 @@ class ResultInfoTest {
     }
 
     @Test
+    fun `Running data class contract - equals and hashCode`() {
+        // Arrange
+        val metadata = mapOf("key" to "value")
+        val running1 = Status.Running(source = "API", timestamp = 100L, metadata = metadata)
+        val running2 = Status.Running(source = "API", timestamp = 100L, metadata = metadata)
+        val running3 = Status.Running(source = "CACHE", timestamp = 100L, metadata = metadata)
+
+        // Assert
+        assertEquals(running1, running2)
+        assertEquals(running1.hashCode(), running2.hashCode())
+        assertFalse(running1 == running3)
+    }
+
+    @Test
     fun `Success data class contract - equals and hashCode`() {
         // Arrange
         val metadata = mapOf("key" to "value")
-        val success1 = ResultInfo.Success(source = "CACHE", timestamp = 100L, metadata = metadata)
-        val success2 = ResultInfo.Success(source = "CACHE", timestamp = 100L, metadata = metadata)
-        val success3 = ResultInfo.Success(source = "API", timestamp = 100L, metadata = metadata)
+        val success1 = Status.Success(source = "CACHE", timestamp = 100L, metadata = metadata)
+        val success2 = Status.Success(source = "CACHE", timestamp = 100L, metadata = metadata)
+        val success3 = Status.Success(source = "LOCAL", timestamp = 100L, metadata = metadata)
 
         // Assert
         assertEquals(success1, success2)
@@ -110,9 +142,9 @@ class ResultInfoTest {
     @Test
     fun `Failure data class contract - equals and hashCode`() {
         // Arrange
-        val failure1 = ResultInfo.Failure(code = "ERROR", message = "Failed", timestamp = 100L)
-        val failure2 = ResultInfo.Failure(code = "ERROR", message = "Failed", timestamp = 100L)
-        val failure3 = ResultInfo.Failure(code = "OTHER", message = "Failed", timestamp = 100L)
+        val failure1 = Status.Failure(code = "ERROR", message = "Failed", timestamp = 100L)
+        val failure2 = Status.Failure(code = "ERROR", message = "Failed", timestamp = 100L)
+        val failure3 = Status.Failure(code = "OTHER", message = "Failed", timestamp = 100L)
 
         // Assert
         assertEquals(failure1, failure2)
@@ -121,43 +153,33 @@ class ResultInfoTest {
     }
 
     @Test
-    fun `Sealed class type safety - Success is ResultInfo`() {
-        // Arrange & Act
-        val result: ResultInfo = ResultInfo.Success()
-
-        // Assert
-        assertTrue(result is ResultInfo)
-        assertTrue(result is ResultInfo.Success)
-    }
-
-    @Test
-    fun `Sealed class type safety - Failure is ResultInfo`() {
-        // Arrange & Act
-        val result: ResultInfo = ResultInfo.Failure(code = "ERROR", message = "Failed")
-
-        // Assert
-        assertTrue(result is ResultInfo)
-        assertTrue(result is ResultInfo.Failure)
-    }
-
-    @Test
     fun `Sealed class exhaustive when expression`() {
         // Arrange
-        val successResult: ResultInfo = ResultInfo.Success(source = "API")
-        val failureResult: ResultInfo = ResultInfo.Failure(code = "ERROR", message = "Failed")
+        val runningResult: Status = Status.Running(source = "API")
+        val successResult: Status = Status.Success(source = "API")
+        val failureResult: Status = Status.Failure(code = "ERROR", message = "Failed")
 
         // Act
+        val runningMessage = when (runningResult) {
+            is Status.Running -> "Running from ${runningResult.source}"
+            is Status.Success -> "Success from ${runningResult.source}"
+            is Status.Failure -> "Failure: ${runningResult.message}"
+        }
+
         val successMessage = when (successResult) {
-            is ResultInfo.Success -> "Success from ${successResult.source}"
-            is ResultInfo.Failure -> "Failure: ${successResult.message}"
+            is Status.Running -> "Running from ${successResult.source}"
+            is Status.Success -> "Success from ${successResult.source}"
+            is Status.Failure -> "Failure: ${successResult.message}"
         }
 
         val failureMessage = when (failureResult) {
-            is ResultInfo.Success -> "Success from ${failureResult.source}"
-            is ResultInfo.Failure -> "Failure: ${failureResult.message}"
+            is Status.Running -> "Running from ${failureResult.source}"
+            is Status.Success -> "Success from ${failureResult.source}"
+            is Status.Failure -> "Failure: ${failureResult.message}"
         }
 
         // Assert
+        assertEquals("Running from API", runningMessage)
         assertEquals("Success from API", successMessage)
         assertEquals("Failure: Failed", failureMessage)
     }
@@ -165,7 +187,7 @@ class ResultInfoTest {
     @Test
     fun `Success with empty metadata`() {
         // Arrange & Act
-        val success = ResultInfo.Success(metadata = emptyMap())
+        val success = Status.Success(metadata = emptyMap())
 
         // Assert
         assertTrue(success.metadata.isEmpty())
@@ -183,7 +205,7 @@ class ResultInfoTest {
         )
 
         // Act
-        val success = ResultInfo.Success(metadata = metadata)
+        val success = Status.Success(metadata = metadata)
 
         // Assert
         assertEquals("value", success.metadata["string"])
@@ -196,7 +218,7 @@ class ResultInfoTest {
     @Test
     fun `Failure with retryable flag true`() {
         // Arrange & Act
-        val failure = ResultInfo.Failure(
+        val failure = Status.Failure(
             code = "TIMEOUT",
             message = "Request timeout",
             retryable = true
@@ -209,7 +231,7 @@ class ResultInfoTest {
     @Test
     fun `Failure with retryable flag false`() {
         // Arrange & Act
-        val failure = ResultInfo.Failure(
+        val failure = Status.Failure(
             code = "AUTH_FAILED",
             message = "Invalid credentials",
             retryable = false

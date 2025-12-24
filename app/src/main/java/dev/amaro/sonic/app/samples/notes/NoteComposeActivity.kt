@@ -15,7 +15,7 @@ import org.koin.core.context.startKoin
 
 /**
  * Hosts the NoteComposeRoot so the sample can showcase Compose selectors
- * and rich result handling without touching the legacy navigation stack.
+ * and rich status handling without touching the legacy navigation stack.
  */
 class NoteComposeActivity : ComponentActivity() {
 

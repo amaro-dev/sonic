@@ -12,7 +12,7 @@ can quickly scan intent, prerequisites, workflow, and next steps.
 
 - Multi-platform core: one `IStateManager` implementation powers Android, Desktop, and CLI experiences.
 - Lifecycle-safe bindings: `bindState` connects managers to renderers using any coroutine scope you own.
-- Built-in helpers: ResultInfo/ResultBuilder, selectors, and agents solve recurring “status + cleanup” problems.
+- Built-in helpers: Status, selectors, and agents solve recurring “status + cleanup” problems.
 - Sample app parity: `app/` demonstrates both XML navigation flows and the Compose showcase that mirrors the docs.
 
 ## Prerequisites
@@ -74,7 +74,7 @@ can quickly scan intent, prerequisites, workflow, and next steps.
    }
    ```
 4. **Layer in advanced helpers**
-    - Adopt ResultInfo/ResultBuilder for success & failure tracking (`docs/features/RESULT_HANDLING.md`).
+    - Adopt Status for running/success/failure tracking (`docs/features/RESULT_HANDLING.md`).
     - Use `selectDistinct` with `LocalStateManager` for Compose selectors (`docs/features/SELECTORS.md`).
     - Attach `ResultClearingAgent`, logging agents, or custom middleware as needed (
       `docs/features/MIDDLEWARE_AGENTS.md`).

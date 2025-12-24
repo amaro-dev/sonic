@@ -30,10 +30,10 @@ package dev.amaro.sonic
  * class ResultClearingAgent<T>(
  *     private val stateManager: IStateManager<T>,
  *     private val config: ResultClearingConfig,
- *     private val extractResult: (T) -> ResultInfo?,
+ *     private val extractResult: (T) -> Status?,
  *     private val createClearAction: () -> IAction
  * ) : IStateAgent<T> {
- *     private var lastResult: ResultInfo? = null
+ *     private var lastResult: Status? = null
  *     private var clearJob: Job? = null
  *
  *     override suspend fun process(state: T): T {
@@ -47,8 +47,9 @@ package dev.amaro.sonic
  *             if (result != null) {
  *                 clearJob = stateManager.scopedPerform {
  *                     val delay = when (result) {
- *                         is ResultInfo.Success -> config.successClearDelayMs
- *                         is ResultInfo.Failure -> config.errorClearDelayMs
+ *                         is Status.Running -> return@scopedPerform IAction.NOOP
+ *                         is Status.Success -> config.successClearDelayMs
+ *                         is Status.Failure -> config.errorClearDelayMs
  *                     }
  *                     delay(delay)
  *

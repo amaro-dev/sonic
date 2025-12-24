@@ -18,8 +18,8 @@
       `collectOn*`, `withAgent*`), `StateBinding`, `StateSelectors`, documentation-aligned utilities.
     - Depends on `sonic-core`.
 3. `sonic-result`
-    - The result/status toolkit: `ResultInfo`, `ResultBuilder`, `success`/`failure` helpers, `ResultClearingAgent`,
-      `ResultClearingConfig`, `IStatusContainer`, plus accompanying tests.
+    - The result/status toolkit: `Status`, `ResultClearingAgent`, `ResultClearingConfig`, `IStatusContainer`, plus
+      accompanying tests.
     - Depends on `sonic-core` and coroutines for the agent’s scheduling.
 4. `sonic-compose`
     - Compose-only integrations such as `StateManagerContext`, `LocalStateManager`, future `remember*` helpers, and any
@@ -88,8 +88,8 @@
     - Update usages throughout the repo—including docs—to reference the new module when discussing binding utilities.
 
 4. **Create `sonic-result` Module**
-    - Transfer the result/status toolkit files (`ResultInfo`, `ResultBuilder`, helper functions, `ResultClearingAgent`,
-      `ResultClearingConfig`, `IStatusContainer`) plus unit tests into `sonic-result`.
+    - Transfer the result/status toolkit files (`Status`, `ResultClearingAgent`, `ResultClearingConfig`,
+      `IStatusContainer`) plus unit tests into `sonic-result`.
     - Wire module dependencies (`sonic-result` → `sonic-core`) and update references in app code.
     - Ensure documentation for result handling points to the new artifact.
 

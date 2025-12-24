@@ -2,15 +2,15 @@
 
 ## Overview
 
-Sonic’s result suite (`ResultInfo`, `ResultBuilder`, `ResultClearingAgent`, `IStatusContainer`) standardizes how
+Sonic’s result suite (`Status`, `ResultClearingAgent`, `IStatusContainer`) standardizes how
 features expose successes and failures to the UI without ad-hoc enums or brittle timers.
 
 ## Key Points
 
-- `ResultInfo.Success` and `.Failure` capture metadata such as source, timestamp, retry-ability, and exceptions.
-- `ResultBuilder` provides fluent builders (`success(...)`, `failure(...)`).
+- `Status.Success` and `.Failure` capture metadata such as source, timestamp, retry-ability, and exceptions.
+- `Status.Running` represents in-flight work when you want a single status channel for loading + outcomes.
 - `ResultClearingAgent` clears transient statuses after configurable delays.
-- Implement `IStatusContainer` on your state when you want type-safe extraction of `resultInfo`.
+- Implement `IStatusContainer` on your state when you want type-safe extraction of `status`.
 
 ## Prerequisites
 
@@ -26,16 +26,19 @@ features expose successes and failures to the UI without ad-hoc enums or brittle
            when (action) {
                is Action.Save -> current.copy(
                    notes = current.notes + action.note,
-                   result = success("LOCAL")
-                       .metadata("operation", "save")
-                       .buildSuccess()
+                   status = Status.Success(
+                       source = "LOCAL",
+                       metadata = mapOf("operation" to "save")
+                   )
                )
                is Action.SaveFailed -> current.copy(
-                   result = failure("STORAGE", action.message)
-                       .retryable(true)
-                       .buildFailure()
+                   status = Status.Failure(
+                       code = "STORAGE",
+                       message = action.message,
+                       retryable = true
+                   )
                )
-               is Action.ClearResult -> current.copy(result = null)
+               is Action.ClearResult -> current.copy(status = null)
                else -> current
            }
        }
@@ -44,13 +47,14 @@ features expose successes and failures to the UI without ad-hoc enums or brittle
 
 2. **Integrate with UI**
    ```kotlin
-   val result by manager.listen()
-       .selectDistinct { it.result }
+   val status by manager.listen()
+       .selectDistinct { it.status }
        .collectAsState(null)
 
-   when (val info = result) {
-       is ResultInfo.Success -> Text("✓ ${info.metadata["operation"]} via ${info.source}")
-       is ResultInfo.Failure -> Text("✗ ${info.code}: ${info.message}")
+   when (val info = status) {
+       is Status.Running -> Text("… ${info.source}")
+       is Status.Success -> Text("✓ ${info.metadata["operation"]} via ${info.source}")
+       is Status.Failure -> Text("✗ ${info.code}: ${info.message}")
    }
    ```
 
@@ -66,7 +70,7 @@ features expose successes and failures to the UI without ad-hoc enums or brittle
                        errorClearDelayMs = 5000,
                        clearOnlyRetryableErrors = false
                    ),
-                   extractResult = { it.result },
+                   extractResult = { it.status },
                    createClearAction = { Action.ClearResult }
                )
            )
@@ -78,14 +82,14 @@ features expose successes and failures to the UI without ad-hoc enums or brittle
    ```kotlin
    data class NoteState(
        val notes: List<Note> = emptyList(),
-       override val resultInfo: ResultInfo? = null
+       override val status: Status? = null
    ) : IStatusContainer
    ```
     - Makes it easy for shared agents/utilities to extract results without knowing state shape.
 
 ## Tips
 
-- Reuse the builder helpers (`success(...)`, `failure(...)`) to keep reducer code concise.
+- Prefer `Status` constructors and `copy` for concise reducer code.
 - Keep `Action.ClearResult` (or equivalent) simple so agents can dispatch it safely.
 - Combine with selectors so only the banner recomposes when results change.
 

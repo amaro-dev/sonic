@@ -28,12 +28,12 @@ understand what each sample teaches and how to run it.
         - CLI: execute `./gradlew :app:run` with the `mainClass` pointing to the terminal renderer.
 
 2. **Converter (`samples/converter/`)**
-    - Demonstrates: multi-middleware pipelines, server-side style validation, and `ResultInfo` usage.
+    - Demonstrates: multi-middleware pipelines, server-side style validation, and `Status` usage.
     - Files: `Converter.kt`, `FirstFragment.kt`, `SecondFragment.kt`.
     - Run: `./gradlew :app:installDebug` → open “Converter” launcher icon (defined in `AndroidManifest.xml`).
 
 3. **Notes (`samples/notes/`)**
-    - Demonstrates: storage-backed CRUD, navigation middleware (`Navigator.kt`), `ResultInfo` + `ResultClearingAgent`,
+    - Demonstrates: storage-backed CRUD, navigation middleware (`Navigator.kt`), `Status` + `ResultClearingAgent`,
       and Jetpack Compose selectors.
     - XML flow: launch `NoteActivity` (View-based screens).
     - Compose showcase: launch `NoteComposeActivity` to see `NoteComposeRoot`, CompositionLocals, selectors, and

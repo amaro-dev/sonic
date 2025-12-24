@@ -4,7 +4,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 
 /**
- * A state agent that automatically clears [ResultInfo] after configurable delays.
+ * A state agent that automatically clears [Status] after configurable delays.
  *
  * This agent demonstrates the core pattern for building state agents that react to
  * state changes and dispatch actions. It automatically removes success and error
@@ -36,7 +36,7 @@ import kotlinx.coroutines.delay
  * Usage:
  * ```kotlin
  * data class MyState(
- *     val result: ResultInfo? = null,
+ *     val status: Status? = null,
  *     val data: String = ""
  * )
  *
@@ -52,7 +52,7 @@ import kotlinx.coroutines.delay
  *             errorClearDelayMs = 5000,
  *             clearOnlyRetryableErrors = false
  *         ),
- *         extractResult = { it.result },
+ *         extractResult = { it.status },
  *         createClearAction = { MyAction.ClearResult }
  *     ))
  *     .collectAsState()
@@ -66,13 +66,13 @@ import kotlinx.coroutines.delay
  *
  * @param stateManager The StateManager that provides state and schedules actions
  * @param config Configuration for clearing delays and behavior
- * @param extractResult Function to extract ResultInfo from state (may return null)
+ * @param extractResult Function to extract Status from state (may return null)
  * @param createClearAction Function to create the clear action when result should be cleared
  */
 class ResultClearingAgent<T>(
     private val stateManager: IStateManager<T>,
     private val config: ResultClearingConfig,
-    private val extractResult: (T) -> ResultInfo?,
+    private val extractResult: (T) -> Status?,
     private val createClearAction: () -> IAction
 ) : IStateAgent<T> {
 
@@ -80,7 +80,7 @@ class ResultClearingAgent<T>(
      * Tracks the last result we've seen.
      * Used to detect when result CHANGES (loop prevention).
      */
-    private var lastResult: ResultInfo? = null
+    private var lastResult: Status? = null
 
     /**
      * Reference to the current clearing job.
@@ -109,8 +109,9 @@ class ResultClearingAgent<T>(
             if (result != null) {
                 // Determine delay based on result type and configuration
                 val delay = when (result) {
-                    is ResultInfo.Success -> config.successClearDelayMs
-                    is ResultInfo.Failure -> {
+                    is Status.Running -> return state
+                    is Status.Success -> config.successClearDelayMs
+                    is Status.Failure -> {
                         // Skip clearing non-retryable errors if configured
                         if (config.clearOnlyRetryableErrors && !result.retryable) {
                             return state  // Return early, don't schedule

@@ -48,7 +48,7 @@ object Converter {
                             RoundingMode.HALF_UP
                         )
                     )
-                    is Action.SetResultInfo -> currentState.copy(resultInfo = action.result)
+                    is Action.SetStatus -> currentState.copy(status = action.status)
                     is Action.SwitchCurrencies -> currentState.copy(
                         source = state.value.target,
                         target = state.value.source
@@ -133,7 +133,7 @@ object Converter {
         val target: String? = null,
         val amount: BigDecimal = BigDecimal.ONE,
         val result: BigDecimal? = null,
-        val resultInfo: ResultInfo? = null
+        val status: Status? = null
     ) {
         private val options: Set<CurrencySymbol?> = setOf(
             null,
@@ -155,7 +155,7 @@ object Converter {
         data class SetTarget(val currency: String) : Action()
         data class SetAmount(val amount: String) : Action()
         data class SetResult(val amount: BigDecimal?) : Action()
-        data class SetResultInfo(val result: ResultInfo) : Action()
+        data class SetStatus(val status: Status) : Action()
         object Refresh : Action()
         object SwitchCurrencies : Action()
     }

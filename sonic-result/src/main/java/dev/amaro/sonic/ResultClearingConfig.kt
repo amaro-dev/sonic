@@ -3,7 +3,7 @@ package dev.amaro.sonic
 /**
  * Configuration for result clearing behavior in the Result Clearing Agent.
  *
- * Defines timing and conditions for automatic removal of [ResultInfo] from state
+ * Defines timing and conditions for automatic removal of [Status] from state
  * after successful or failed operations complete. Use this config to control how
  * long results remain visible to the user before being cleared.
  *

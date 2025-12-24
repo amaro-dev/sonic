@@ -100,19 +100,17 @@ class StatusClearingAgent<T>(
             // Update tracking for next comparison
             lastResult = result
 
-            // Only schedule clearing if result is not null
-            if (result != null) {
+            // Determine if we should schedule clearing
+            val shouldSchedule = result != null &&
+                    result !is Status.Running &&
+                    !(result is Status.Failure && config.clearOnlyRetryableErrors && !result.retryable)
+
+            if (shouldSchedule) {
                 // Determine delay based on result type and configuration
                 val delay = when (result) {
-                    is Status.Running -> return state
                     is Status.Success -> config.successClearDelayMs
-                    is Status.Failure -> {
-                        // Skip clearing non-retryable errors if configured
-                        if (config.clearOnlyRetryableErrors && !result.retryable) {
-                            return state  // Return early, don't schedule
-                        }
-                        config.errorClearDelayMs
-                    }
+                    is Status.Failure -> config.errorClearDelayMs
+                    else -> 0  // Should not reach here due to shouldSchedule check
                 }
 
                 // Schedule clearing via scopedPerform for async execution

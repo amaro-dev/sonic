@@ -26,11 +26,11 @@ can quickly scan intent, prerequisites, workflow, and next steps.
 1. **Install the library**
    ```kotlin
    // From Maven Central (preferred)
-   implementation(platform("dev.amaro.sonic:sonic-bom:0.6.0"))
-   implementation("dev.amaro.sonic:sonic-core")
-   implementation("dev.amaro.sonic:sonic-binding")
-   implementation("dev.amaro.sonic:sonic-result")
-   implementation("dev.amaro.sonic:sonic-compose")
+   implementation(platform("dev.amaro.sonic:bom:0.6.0"))
+   implementation("dev.amaro.sonic:core")
+   implementation("dev.amaro.sonic:binding")
+   implementation("dev.amaro.sonic:result")
+   implementation("dev.amaro.sonic:compose")
 
    // From a multi-module workspace
    implementation(project(":sonic-core"))

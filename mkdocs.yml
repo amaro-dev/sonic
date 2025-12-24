@@ -35,7 +35,6 @@ nav:
       - SAMPLE_WALKTHROUGH.md
   - Core Concepts:
       - CONCEPTS.md
-      - SPEC_MODULARIZATION.md
   - Features:
       - Binding: features/BINDING.md
       - Dispatchers: features/DISPATCHERS.md

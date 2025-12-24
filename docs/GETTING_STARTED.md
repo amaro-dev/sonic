@@ -26,11 +26,11 @@ have never touched the project before and want a reproducible checklist from clo
    ```kotlin
    // build.gradle.kts (module)
    dependencies {
-       implementation(platform("dev.amaro.sonic:sonic-bom:0.6.0"))
-       implementation("dev.amaro.sonic:sonic-core")
-       implementation("dev.amaro.sonic:sonic-binding")
-       implementation("dev.amaro.sonic:sonic-result")
-       implementation("dev.amaro.sonic:sonic-compose")
+       implementation(platform("dev.amaro.sonic:bom:0.6.0"))
+       implementation("dev.amaro.sonic:core")
+       implementation("dev.amaro.sonic:binding")
+       implementation("dev.amaro.sonic:result")
+       implementation("dev.amaro.sonic:compose")
        // or, when working inside this repo, depend on the matching modules directly
    }
    ```

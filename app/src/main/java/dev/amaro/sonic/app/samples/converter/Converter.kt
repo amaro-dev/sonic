@@ -29,7 +29,7 @@ object Converter {
         initialState: State,
         scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     ) :
-        StateManager<State>(initialState, scope) {
+        StateManager<State>(initialState, scope, mutableListOf()) {
         init {
             addMiddleware(AmountValidator())
             addMiddleware(CurrencySelection())
@@ -50,8 +50,8 @@ object Converter {
                     )
                     is Action.SetStatus -> currentState.copy(status = action.status)
                     is Action.SwitchCurrencies -> currentState.copy(
-                        source = state.value.target,
-                        target = state.value.source
+                        source = currentState.target,
+                        target = currentState.source
                     )
                     else -> currentState
                 }

@@ -1,10 +1,11 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'org.jetbrains.kotlin.plugin.compose'
 }
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 35
 
     defaultConfig {
         applicationId "dev.amaro.sonic.app"
@@ -29,7 +30,6 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion kotlin_version
     }
 
     compileOptions {
@@ -50,29 +50,29 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'dev.amaro:view-navigation:0.2.1'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.8.0'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.8.0'
-    implementation "androidx.navigation:navigation-runtime-ktx:2.8.0"
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.9.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.9.3'
+    implementation "androidx.navigation:navigation-runtime-ktx:2.9.3"
     implementation 'com.google.code.gson:gson:2.9.0'
 
     // Compose
     implementation "androidx.compose.ui:ui:$compose_version_tools"
     implementation "androidx.compose.material:material:$compose_version_tools"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version_tools"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.5'
-    implementation 'androidx.activity:activity-compose:1.9.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.9.0'
+    implementation 'androidx.activity:activity-compose:1.10.1'
 
     implementation "io.insert-koin:koin-core:$koin_version"
     implementation "io.insert-koin:koin-android:$koin_version"
     testImplementation "io.insert-koin:koin-test:$koin_version"
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'io.mockk:mockk:1.12.4'
+    testImplementation 'io.mockk:mockk:1.14.7'
     testImplementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    testImplementation "io.mockk:mockk-agent-jvm:1.12.4"
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0'
+    testImplementation "io.mockk:mockk-agent-jvm:1.14.7"
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2'
     testImplementation "org.robolectric:robolectric:4.10.3"
     testImplementation "androidx.test:core:1.6.1"
     testImplementation "androidx.test:runner:1.6.2"

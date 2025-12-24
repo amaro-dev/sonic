@@ -17,24 +17,28 @@ buildscript {
     ext.sonarSetup['organizationId'] = System.env.SONARORGANIZATIONID ?: props.getProperty("sonar.organizationId") ?: ""
     ext.sonarSetup['token'] = System.env.SONARTOKEN ?: props.getProperty("sonar.token") ?: ""
 
-    ext.kotlin_version = "1.9.24"
+    ext.kotlin_version = "2.0.20"
     ext.koin_version = "3.5.6"
-    ext.compose_version = "1.5.14"
-    ext.compose_version_tools = "1.6.8"
+    ext.compose_version = "2.0.20"
+    ext.compose_version_tools = "1.7.0"
 
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.5.2'
+        classpath 'com.android.tools.build:gradle:8.6.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jacoco:org.jacoco.core:${jacocoSetup.version}"
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:${sonarSetup.version}"
-        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.4"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.8"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+}
+
+plugins {
+    id 'org.jetbrains.kotlin.plugin.compose' version '2.0.20' apply false
 }
 
 allprojects {

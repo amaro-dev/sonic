@@ -4,16 +4,15 @@ import androidx.navigation.NavController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dev.amaro.sonic.app.samples.notes.*
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.*
+import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.koin.android.ext.koin.androidContext
-import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
@@ -21,9 +20,11 @@ import org.koin.test.KoinTest
 import org.koin.test.get
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class NoteTest : KoinTest {
 
+    private lateinit var storage: FakeStorage
     private val oneTodo = listOf(Note("Task 1", false))
     private val oneTodoAndOneClosed = listOf(
         Note("Task 1", false),
@@ -32,11 +33,15 @@ class NoteTest : KoinTest {
 
     @Before
     fun setUp() {
+        storage = FakeStorage()
         startKoin {
             androidContext(ApplicationProvider.getApplicationContext())
             modules(
-                module { factory { mockk<NavController>(relaxed = true) } },
-                NoteModule.Instance
+                module {
+                    factory { mockk<NavController>(relaxed = true) }
+                    single<IStorage> { storage }
+                    single { NoteStateManager() }
+                }
             )
         }
     }
@@ -47,71 +52,124 @@ class NoteTest : KoinTest {
     }
 
     @Test
-    fun `Load saved notes on start`() = kotlinx.coroutines.test.runTest {
+    fun `Load saved notes on start`() = runMainTest {
         setNotesOnStorage(oneTodoAndOneClosed)
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        NoteScreen(renderer, get(), this)
-        advanceUntilIdle()
-        renderer.verifyState(NoteState(oneTodoAndOneClosed))
+        val scope = CoroutineScope(UnconfinedTestDispatcher(testScheduler) + Job())
+        try {
+            NoteScreen(renderer, get(), scope)
+            advanceUntilIdle()
+            renderer.verifyState(NoteState(oneTodoAndOneClosed))
+        } finally {
+            scope.cancel()
+        }
     }
 
     @Test
-    fun `Toggle closed notes`() = kotlinx.coroutines.test.runTest {
+    fun `Toggle closed notes`() = runMainTest {
         setNotesOnStorage(oneTodoAndOneClosed)
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val screen = NoteScreen(renderer, get(), this)
-        advanceUntilIdle()
-        screen.perform(Action.ToggleClosedNotes)
-        advanceUntilIdle()
-        renderer.verifyState(NoteState(oneTodo, true))
+        val scope = CoroutineScope(UnconfinedTestDispatcher(testScheduler) + Job())
+        try {
+            val screen = NoteScreen(renderer, get(), scope)
+            advanceUntilIdle()
+            screen.perform(Action.ToggleClosedNotes)
+            advanceUntilIdle()
+            renderer.verifyState(NoteState(oneTodo, true))
+        } finally {
+            scope.cancel()
+        }
     }
 
     @Test
-    fun `Add new note`() = kotlinx.coroutines.test.runTest {
+    fun `Add new note`() = runMainTest {
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val screen = NoteScreen(renderer, get(), this)
-        advanceUntilIdle()
-        screen.perform(Action.AddNote(Note("Task 1", false)))
-        advanceUntilIdle()
-        renderer.verifyState(NoteState(oneTodo, false))
+        val scope = CoroutineScope(UnconfinedTestDispatcher(testScheduler) + Job())
+        try {
+            val screen = NoteScreen(renderer, get(), scope)
+            advanceUntilIdle()
+            screen.perform(Action.AddNote(Note("Task 1", false)))
+            advanceUntilIdle()
+            renderer.verifyState(NoteState(oneTodo, false))
+        } finally {
+            scope.cancel()
+        }
     }
 
     @Test
-    fun `Add two new notes`() = kotlinx.coroutines.test.runTest {
+    fun `Add two new notes`() = runMainTest {
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val screen = NoteScreen(renderer, get(), this)
-        advanceUntilIdle()
-        screen.perform(Action.AddNote(Note("Task 1", false)))
-        advanceUntilIdle()
-        screen.perform(Action.AddNote(Note("Task 2", true)))
-        advanceUntilIdle()
-        renderer.verifyState(NoteState(oneTodoAndOneClosed, false))
+        val scope = CoroutineScope(UnconfinedTestDispatcher(testScheduler) + Job())
+        try {
+            val screen = NoteScreen(renderer, get(), scope)
+            advanceUntilIdle()
+            screen.perform(Action.AddNote(Note("Task 1", false)))
+            advanceUntilIdle()
+            screen.perform(Action.AddNote(Note("Task 2", true)))
+            advanceUntilIdle()
+            renderer.verifyState(NoteState(oneTodoAndOneClosed, false))
+        } finally {
+            scope.cancel()
+        }
     }
 
     @Test
-    fun `Toggle note`() = kotlinx.coroutines.test.runTest {
+    fun `Toggle note`() = runMainTest {
         val renderer: IRenderer<NoteState> = mockk(relaxed = true)
-        val screen = NoteScreen(renderer, get(), this)
-        advanceUntilIdle()
-        screen.perform(Action.AddNote(Note("Task 1", false)))
-        advanceUntilIdle()
-        screen.perform(Action.ToggleNote(Note("Task 1", false)))
-        advanceUntilIdle()
-        renderer.verifyState(NoteState(listOf(Note("Task 1", true)), false))
+        val scope = CoroutineScope(UnconfinedTestDispatcher(testScheduler) + Job())
+        try {
+            val screen = NoteScreen(renderer, get(), scope)
+            advanceUntilIdle()
+            screen.perform(Action.AddNote(Note("Task 1", false)))
+            advanceUntilIdle()
+            screen.perform(Action.ToggleNote(Note("Task 1", false)))
+            advanceUntilIdle()
+            renderer.verifyState(NoteState(listOf(Note("Task 1", true)), false))
+        } finally {
+            scope.cancel()
+        }
     }
 
-    private fun <T> IRenderer<T>.verifyState(state: T) {
-        verify { render(state, any()) }
+    private fun runMainTest(block: suspend TestScope.() -> Unit) = kotlinx.coroutines.test.runTest {
+        Dispatchers.setMain(UnconfinedTestDispatcher(testScheduler))
+        try {
+            block()
+        } finally {
+            Dispatchers.resetMain()
+        }
+    }
+
+    private fun IRenderer<NoteState>.verifyState(expected: NoteState) {
+        verify {
+            render(match { it.notes == expected.notes && it.showOnlyOpen == expected.showOnlyOpen }, any())
+        }
     }
 
     private fun setNotesOnStorage(notes: List<Note>) {
-        val storage: IStorage = mockk(relaxed = true)
-        every { storage.list() } returns notes
-        loadKoinModules(
-            module {
-                single<IStorage>() { storage }
-            }
-        )
+        storage.replaceAll(notes)
+    }
 
+    private class FakeStorage : IStorage {
+        private val items = mutableListOf<Note>()
+
+        override fun list(): List<Note> = items.toList()
+
+        override fun save(note: Note) {
+            items.add(note)
+        }
+
+        override fun update(note: Note) {
+            items.remove(note)
+            items.add(note.copy(done = !note.done))
+        }
+
+        override fun delete(note: Note) {
+            items.remove(note)
+        }
+
+        fun replaceAll(notes: List<Note>) {
+            items.clear()
+            items.addAll(notes)
+        }
     }
 }

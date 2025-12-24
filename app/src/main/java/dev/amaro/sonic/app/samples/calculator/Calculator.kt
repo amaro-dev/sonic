@@ -43,7 +43,7 @@ object Calculator {
     class SimpleStateManager(
         scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     ) :
-        StateManager<State>(State(), scope) {
+        StateManager<State>(State(), scope, mutableListOf()) {
         init {
             addMiddleware(OperationParser())
             addMiddleware(Calculation())

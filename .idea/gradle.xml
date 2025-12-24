@@ -10,7 +10,11 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/detekt-rules" />
-            <option value="$PROJECT_DIR$/library" />
+            <option value="$PROJECT_DIR$/sonic-binding" />
+            <option value="$PROJECT_DIR$/sonic-bom" />
+            <option value="$PROJECT_DIR$/sonic-compose" />
+            <option value="$PROJECT_DIR$/sonic-core" />
+            <option value="$PROJECT_DIR$/sonic-result" />
           </set>
         </option>
       </GradleProjectSettings>

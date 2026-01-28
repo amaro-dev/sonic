@@ -24,6 +24,7 @@ abstract class StateManager<T>(
     private val middlewares: MutableList<IMiddleware<T>> = mutableListOf(DirectMiddleware())
 ) : IStateManager<T>, IProcessor<T> {
     protected val state = MutableStateFlow(initialState)
+    private val actionScheduler = ActionScheduler()
 
     /**
      * Appends middleware to the processing pipeline. Called during initialization.
@@ -38,14 +39,33 @@ abstract class StateManager<T>(
 
     override fun reduce(action: IAction) {
         state.value = reducer.reduce(action, state.value)
+        // Execute side effects when reduce() is called directly
         if (action is ISideEffectAction) {
             perform(action.sideEffect)
         }
     }
 
+    override fun schedule(action: IAction) {
+        actionScheduler.schedule(action)
+    }
+
     override fun perform(action: IAction) {
         scope.launch {
-            middlewares.forEach { it.process(action, state.value, this@StateManager) }
+            performInternal(action)
+        }
+    }
+
+    private suspend fun performInternal(action: IAction) {
+        // Capture current state before processing
+        val currentState = state.value
+
+        // Process the action through middleware
+        middlewares.forEach { it.process(action, currentState, this@StateManager) }
+
+        // After middleware processing, drain scheduled actions
+        actionScheduler.drain { scheduledAction ->
+            // Re-enter the full pipeline for each scheduled action
+            perform(scheduledAction)
         }
     }
 

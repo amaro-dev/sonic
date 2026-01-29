@@ -26,6 +26,8 @@ same mental model before touching feature-specific guides.
 2. **IReducer**
     - Pure function interface `(action, currentState) -> newState`.
     - Must be deterministic and side-effect free; persistence/network work belongs in middleware.
+   - For large applications, use `CompositeReducer` and `SliceReducer` to split reducer logic across domains (see
+     `docs/features/REDUCERS.md`).
 
 3. **IStateManager / StateManager**
     - Hosts current state (`StateFlow`) and orchestrates middlewares + reducer execution.
@@ -42,7 +44,10 @@ same mental model before touching feature-specific guides.
 
 6. **IProcessor**
     - Internal interface used by `StateManager` to pass actions between middleware and reducer.
-    - Rarely implemented directly; understanding it helps when building custom managers.
+   - Provides three methods: `perform()` (re-enter middleware), `reduce()` (skip to reducer), `schedule()` (defer until
+     after reduction).
+   - Understanding it helps when building custom managers or complex middleware (see
+     `docs/features/MIDDLEWARE_AGENTS.md`).
 
 7. **bindState / StateBinding**
     - Utility to connect a manager to a renderer within any coroutine scope.

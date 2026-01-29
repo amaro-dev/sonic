@@ -88,12 +88,87 @@ add cross-cutting behaviors such as logging or result clearing.
     - Use `stateManager.scopedPerform { action }` inside an agent for async operations (see `StatusClearingAgent` for
       the canonical pattern with cancellation + verification).
 
+5. **Scheduling actions from middleware**
+
+   The `IProcessor.schedule()` method allows middleware to queue actions that execute **after** the current state
+   reduction completes. This is useful for follow-up actions that depend on the updated state.
+
+   ```kotlin
+   class ValidationMiddleware : IMiddleware<FormState> {
+       override suspend fun process(action: IAction, state: FormState, processor: IProcessor<FormState>) {
+           when (action) {
+               is Action.Submit -> {
+                   processor.reduce(action)  // Apply state update immediately
+                   processor.schedule(Action.ValidateSubmission)  // Queue follow-up
+               }
+               is Action.ValidateSubmission -> {
+                   // Runs AFTER Submit completes, sees updated state
+                   val isValid = state.form.isComplete && state.form.hasEmail
+                   if (isValid) {
+                       processor.reduce(Action.MarkValid)
+                   } else {
+                       processor.reduce(Action.ShowValidationError("Form incomplete"))
+                   }
+               }
+               else -> processor.perform(action)
+           }
+       }
+   }
+   ```
+
+   **Key characteristics:**
+   - **Execution order**: State update → scheduled actions (FIFO) → agents → UI render
+   - **Thread-safe**: Uses `Mutex` + `ConcurrentLinkedQueue` for safe concurrent middleware access
+   - **Re-enters middleware**: Scheduled actions go through `perform()`, allowing middleware interception
+   - **Use cases**: Derived actions, post-update validation, chained operations
+
+6. **When to use schedule() vs perform() vs reduce()**
+
+   Choose the right `IProcessor` method based on when and how the action should execute:
+
+   | Method                 | When to Use                                      | Execution Timing                 | Middleware Interaction |
+      |------------------------|--------------------------------------------------|----------------------------------|------------------------|
+   | `processor.perform()`  | Continue through middleware pipeline             | Immediate, re-enters middleware  | Intercepted by all middleware |
+   | `processor.reduce()`   | Skip middleware, apply reduction now             | Immediate, bypasses middleware   | Skips middleware entirely |
+   | `processor.schedule()` | Defer until after current reduction completes    | After state update, before agents | Re-enters middleware via perform() |
+
+   **Examples:**
+
+   ```kotlin
+   // Use perform() to let other middleware intercept
+   override suspend fun process(action: IAction, state: T, processor: IProcessor<T>) {
+       if (action is Action.LogEntry) {
+           log(action.message)
+           processor.perform(action) // Continue to next middleware/reducer
+       }
+   }
+
+   // Use reduce() to bypass middleware (e.g., validation failures)
+   override suspend fun process(action: IAction, state: T, processor: IProcessor<T>) {
+       if (action is Action.AddItem && action.item.price < 0) {
+           processor.reduce(Action.ValidationError("Price must be positive"))
+           return // Don't continue the original action
+       }
+       processor.perform(action)
+   }
+
+   // Use schedule() for follow-up actions depending on state changes
+   override suspend fun process(action: IAction, state: T, processor: IProcessor<T>) {
+       if (action is Action.DeleteUser) {
+           processor.reduce(action) // Delete user first
+           processor.schedule(Action.CleanupUserData) // Then cleanup (sees updated state)
+       }
+   }
+   ```
+
 ## Tips
 
 - Keep middleware focused: one responsibility per class makes testing and reuse easy.
 - Prevent loops in agents by checking whether the condition actually changed before dispatching.
 - When composing multiple agents, order matters only if they rely on shared side effects. Each receives the same state
   snapshot produced by the reducer.
+- Use `schedule()` to avoid re-entrancy issues: If middleware needs to dispatch follow-up actions after state updates,
+  `schedule()` ensures the current reduction completes before the next action executes.
 
 ## Next Steps
 

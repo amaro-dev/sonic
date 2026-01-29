@@ -39,6 +39,14 @@ understand what each sample teaches and how to run it.
     - Compose showcase: launch `NoteComposeActivity` to see `NoteComposeRoot`, CompositionLocals, selectors, and
       auto-clearing result banners.
 
+4. **Shopping Cart (`samples/multireducer/`)**
+   - Demonstrates: `CompositeReducer`, `SliceReducer`, domain-separated state, all three composition patterns (verbose,
+     concise, DSL).
+   - Files of interest: `ShoppingCartExample.kt` showing `VerboseStateManager`, `ConciseStateManager`,
+     `DSLStateManager`.
+   - This is a code-only sample (no UI) demonstrating reducer composition architecture.
+   - Review alongside `docs/features/REDUCERS.md` to understand the progression from monolithic to composed reducers.
+
 ## Next Steps
 
 - Use these samples as blueprints when bootstrapping new features.

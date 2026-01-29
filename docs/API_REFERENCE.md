@@ -17,25 +17,29 @@ section that explains them in depth.
 
 ## Reference Table
 
-| File                                                    | Description                                              | See Also                         |
-|---------------------------------------------------------|----------------------------------------------------------|----------------------------------|
-| `IAction.kt`                                            | Marker interface for user/business intents.              | Concepts §1                      |
-| `IReducer.kt`                                           | Pure function to transform state.                        | Concepts §2                      |
-| `IStateManager.kt` / `StateManager.kt`                  | Core state container with middleware support.            | Concepts §3; features/binding.md |
-| `IMiddleware.kt`                                        | Action interceptor contract.                             | features/middleware_agents.md    |
-| `DirectMiddleware.kt`, `ConditionedDirectMiddleware.kt` | Ready-made middleware implementations.                   | features/middleware_agents.md    |
-| `IRenderer.kt`, `IPerformer.kt`                         | UI binding interfaces.                                   | features/binding.md              |
-| `Binding.kt`                                            | `bindState` helper for lifecycle-safe rendering.         | features/binding.md              |
-| `StateBinding.kt`                                       | Value/performer wrapper for Compose previews or DI.      | features/binding.md              |
-| `IProcessor.kt`, `Processor.kt`                         | Internal bridge between middleware and reducer.          | Concepts §3                      |
-| `Status.kt`                                             | Running/success/failure model.                           | features/result_handling.md      |
-| `StatusClearingAgent.kt`, `ResultClearingConfig.kt`     | Auto-clearing agent and config.                          | features/result_handling.md      |
-| `ResultActions.kt`                                      | Canonical result actions (includes `ClearStatus`).       | features/result_handling.md      |
-| `IStatusContainer.kt`                                   | Optional mixin exposing `status`.                        | features/result_handling.md      |
-| `IStateAgent.kt`                                        | State reaction contract.                                 | features/middleware_agents.md    |
-| `Extensions.kt`                                         | Flow helpers (`collectOn`, `withAgent`, etc.).           | features/middleware_agents.md    |
-| `StateSelectors.kt`                                     | `selectDistinct` extensions for Flow/StateFlow.          | features/selectors.md            |
-| `CompositionLocals.kt`                                  | `LocalStateManager` & `StateManagerContext` for Compose. | features/selectors.md            |
+| File                                                    | Description                                              | See Also                                   |
+|---------------------------------------------------------|----------------------------------------------------------|--------------------------------------------|
+| `IAction.kt`                                            | Marker interface for user/business intents.              | Concepts §1                                |
+| `IReducer.kt`                                           | Pure function to transform state.                        | Concepts §2                                |
+| `IStateManager.kt` / `StateManager.kt`                  | Core state container with middleware support.            | Concepts §3; features/binding.md           |
+| `IMiddleware.kt`                                        | Action interceptor contract.                             | features/middleware_agents.md              |
+| `DirectMiddleware.kt`, `ConditionedDirectMiddleware.kt` | Ready-made middleware implementations.                   | features/middleware_agents.md              |
+| `IRenderer.kt`, `IPerformer.kt`                         | UI binding interfaces.                                   | features/binding.md                        |
+| `Binding.kt`                                            | `bindState` helper for lifecycle-safe rendering.         | features/binding.md                        |
+| `StateBinding.kt`                                       | Value/performer wrapper for Compose previews or DI.      | features/binding.md                        |
+| `IProcessor.kt`, `Processor.kt`                         | Internal bridge with perform/reduce/schedule methods.    | Concepts §6; features/middleware_agents.md |
+| `Status.kt`                                             | Running/success/failure model.                           | features/result_handling.md                |
+| `StatusClearingAgent.kt`, `ResultClearingConfig.kt`     | Auto-clearing agent and config.                          | features/result_handling.md                |
+| `ResultActions.kt`                                      | Canonical result actions (includes `ClearStatus`).       | features/result_handling.md                |
+| `IStatusContainer.kt`                                   | Optional mixin exposing `status`.                        | features/result_handling.md                |
+| `IStateAgent.kt`                                        | State reaction contract.                                 | features/middleware_agents.md              |
+| `Extensions.kt`                                         | Flow helpers (`collectOn`, `withAgent`, etc.).           | features/middleware_agents.md              |
+| `StateSelectors.kt`                                     | `selectDistinct` extensions for Flow/StateFlow.          | features/selectors.md                      |
+| `CompositionLocals.kt`                                  | `LocalStateManager` & `StateManagerContext` for Compose. | features/selectors.md                      |
+| `CompositeReducer.kt`                                   | Combines multiple reducers using fold pattern.           | features/reducers.md                       |
+| `SliceReducer.kt`                                       | Type-safe domain-specific reducer with selector/updater. | features/reducers.md                       |
+| `ReducerBuilders.kt`                                    | DSL helpers: sliceReducer(), buildCompositeReducer().    | features/reducers.md                       |
+| `ActionScheduler.kt`                                    | Internal FIFO queue for deferred actions.                | features/middleware_agents.md              |
 
 ## Next Steps
 
